@@ -1,32 +1,31 @@
 package ua.pimenova.controller.listener;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InitListener implements ServletContextListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(InitListener.class);
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        ServletContext servletContext = servletContextEvent.getServletContext();
+        logger.info("Servlet context is initialized");
         initCommandFactory();
     }
 
     private void initCommandFactory() {
-
-        // initialize commands container
-        // just load class to JVM
         try {
             Class.forName("ua.pimenova.controller.command.CommandFactory");
+            logger.info("Command factory is initialized");
         } catch (ClassNotFoundException ex) {
+            logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        logger.info("Servlet context is destroyed");
     }
 }

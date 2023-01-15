@@ -4,8 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.*;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
@@ -17,6 +18,7 @@ import static ua.pimenova.controller.constants.Commands.*;
 
 public class CreateOrderCommand implements ICommand {
     private final OrderService orderService;
+    private static final Logger logger = LoggerFactory.getLogger(CreateOrderCommand.class);
 
     public CreateOrderCommand(OrderService orderService) {
         this.orderService = orderService;
@@ -42,8 +44,7 @@ public class CreateOrderCommand implements ICommand {
             try {
                 order = orderService.create(order);
             } catch (DaoException e) {
-                e.printStackTrace();
-                return path;
+                logger.error(e.getMessage());
             }
             path = SHOW_PAGE_CREATE_ORDER;
             request.getSession().setAttribute("newOrder", order);

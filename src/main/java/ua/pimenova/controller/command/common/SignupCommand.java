@@ -4,13 +4,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.UserService;
 
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
@@ -21,6 +24,7 @@ public class SignupCommand implements ICommand {
     public SignupCommand(UserService userService) {
         this.userService = userService;
     }
+    private static final Logger logger = LoggerFactory.getLogger(SignupCommand.class);
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -35,27 +39,27 @@ public class SignupCommand implements ICommand {
 
     private String executePost(HttpServletRequest request) {
         User user = getUser(request);
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
         try {
             if (userService.getByPhone(user.getPhone()) != null) {
-                String errorPhone = "This phone number is already in use.";
+                String errorPhone = ResourceBundle.getBundle("messages", locale).getString("signup.phone.in.use");
                 request.getSession().setAttribute("errorPhone", errorPhone);
                 request.getSession().setAttribute("url", SHOW_SIGNUP_PAGE);
                 return request.getContextPath() + SHOW_SIGNUP_PAGE;
             }
             if (userService.getByEmail(user.getEmail()) != null) {
-                String errorEmail = "This e-mail is already in use.";
+                String errorEmail = ResourceBundle.getBundle("messages", locale).getString("signup.email.in.use");
                 request.getSession().setAttribute("errorEmail", errorEmail);
                 request.getSession().setAttribute("url", SHOW_SIGNUP_PAGE);
                 return request.getContextPath() + SHOW_SIGNUP_PAGE;
             }
             userService.create(user);
         } catch (DaoException e) {
-            e.printStackTrace();
-            return request.getContextPath() + ERROR;
+            logger.error(e.getMessage());
         }
-        HttpSession newSession = request.getSession(true);
-        newSession.setAttribute("user", user);
-        newSession.setAttribute("userRole", user.getRole());
+        HttpSession session = request.getSession(true);
+        session.setAttribute("user", user);
+        session.setAttribute("userRole", user.getRole());
         request.getSession().setAttribute("url", PROFILE);
         return request.getContextPath() + PROFILE;
     }

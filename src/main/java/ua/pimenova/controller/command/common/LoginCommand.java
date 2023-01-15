@@ -4,18 +4,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.UserService;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 
 public class LoginCommand implements ICommand {
 
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(LoginCommand.class);
 
     public LoginCommand(UserService userService) {
         this.userService = userService;
@@ -36,22 +41,22 @@ public class LoginCommand implements ICommand {
         String login = request.getParameter("emaillogin");
         String password = request.getParameter("passlogin");
         User user;
-        String path;
+        String path = ERROR;
         try {
             user = userService.getUserByEmailAndPassword(login, password);
             if (user != null) {
-                HttpSession newSession = request.getSession(false);
-                newSession.setAttribute("user", user);
-                newSession.setAttribute("userRole", user.getRole());
+                HttpSession session = request.getSession(false);
+                session.setAttribute("user", user);
+                session.setAttribute("userRole", user.getRole());
                 path = PROFILE;
             } else {
-                String errorMessage = "Either username or password is wrong.";
+                Locale locale = (Locale) request.getSession().getAttribute("locale");
+                String errorMessage = ResourceBundle.getBundle("messages", locale).getString("wrong.username.password");
                 request.getSession().setAttribute("errorMessage", errorMessage);
                 path = ERROR;
             }
         } catch (DaoException e) {
-            e.printStackTrace();
-            return Pages.PAGE_ERROR;
+            logger.error(e.getMessage());
         }
         request.getSession().setAttribute("url", path);
         return request.getContextPath() + path;

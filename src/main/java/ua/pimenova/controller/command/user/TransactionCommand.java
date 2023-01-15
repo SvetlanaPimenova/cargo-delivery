@@ -4,6 +4,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.database.entity.User;
@@ -11,6 +13,9 @@ import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
 import ua.pimenova.model.service.UserService;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 
@@ -18,6 +23,7 @@ public class TransactionCommand implements ICommand {
     private final OrderService orderService;
     private final UserService userService;
     private boolean isUpdated;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionCommand.class);
 
     public TransactionCommand(OrderService orderService, UserService userService) {
         this.orderService = orderService;
@@ -33,10 +39,10 @@ public class TransactionCommand implements ICommand {
         getAttributeFromSessionToRequest(request,"order_id");
         getAttributeFromSessionToRequest(request, "isUpdated");
         getAttributeFromSessionToRequest(request, "errorMessage");
-        return getURL(request) + formURL(request);
+        return getURL(request) + formParameters(request);
     }
 
-    private String formURL(HttpServletRequest request) {
+    private String formParameters(HttpServletRequest request) {
         String orderId = (String) request.getAttribute("order_id");
         String isUpdated = (String) request.getAttribute("isUpdated");
         return "?order_id=" + orderId + "&isUpdated=" + isUpdated;
@@ -52,7 +58,8 @@ public class TransactionCommand implements ICommand {
                 int totalCost = order.getTotalCost();
                 int currentAccount = user.getAccount();
                 if (currentAccount < totalCost) {
-                    String errorMessage = "Your account does not have enough funds for debiting. Please top up your account!";
+                    Locale locale = (Locale) request.getSession().getAttribute("locale");
+                    String errorMessage = ResourceBundle.getBundle("messages", locale).getString("account.not.enough.funds");
                     session.setAttribute("errorMessage", errorMessage);
                     session.setAttribute("url", ERROR);
                     return request.getContextPath() + ERROR;
@@ -65,7 +72,7 @@ public class TransactionCommand implements ICommand {
                 return request.getContextPath() + TRANSACTION;
             }
         } catch (DaoException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         session.setAttribute("url", ERROR);
         return request.getContextPath() + ERROR;

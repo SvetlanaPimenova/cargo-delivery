@@ -1,11 +1,12 @@
 package ua.pimenova.model.database.dao.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.model.database.dao.HikariCPDataSource;
 import ua.pimenova.model.database.dao.SqlQuery;
 import ua.pimenova.model.database.dao.UserDao;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
-import ua.pimenova.model.util.EncryptingUserPassword;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class UserDaoImpl implements UserDao {
     private static UserDaoImpl instance = null;
+    private static final Logger logger = LoggerFactory.getLogger(UserDaoImpl.class);
 
     private UserDaoImpl() {
     }
@@ -34,7 +36,7 @@ public class UserDaoImpl implements UserDao {
                 return getUser(resultSet);
             }
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -66,7 +68,7 @@ public class UserDaoImpl implements UserDao {
             ResultSet resultSet = statement.executeQuery(SqlQuery.UsersQuery.SELECT_ALL_USERS);
             users = getListOfUsers(users, resultSet);
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return users;
@@ -111,7 +113,7 @@ public class UserDaoImpl implements UserDao {
             }
             return user;
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -132,7 +134,7 @@ public class UserDaoImpl implements UserDao {
             statement.setInt(10, user.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -145,7 +147,7 @@ public class UserDaoImpl implements UserDao {
             statement.setInt(2, user.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -157,7 +159,7 @@ public class UserDaoImpl implements UserDao {
             statement.setInt(1, user.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -172,7 +174,7 @@ public class UserDaoImpl implements UserDao {
                 return getUser(resultSet);
             }
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -188,7 +190,7 @@ public class UserDaoImpl implements UserDao {
                 return getUser(resultSet);
             }
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -205,7 +207,7 @@ public class UserDaoImpl implements UserDao {
                 return getUser(resultSet);
             }
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;

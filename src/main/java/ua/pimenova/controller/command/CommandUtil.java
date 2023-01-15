@@ -14,7 +14,6 @@ public class CommandUtil {
         String attributeValue = (String) request.getSession().getAttribute(attribute);
         if (attributeValue != null) {
             request.setAttribute(attribute, attributeValue);
-            System.out.println("In util: " + request.getAttribute(attribute));
             request.getSession().removeAttribute(attribute);
         }
     }

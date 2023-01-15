@@ -41,13 +41,6 @@ public class SqlQuery {
                 + "street = ?, postal_code = ? WHERE id = ?";
         public static final String DELETE_RECEIVER = "DELETE FROM receivers WHERE id = ?";
     }
-    public static class RateQuery {
-        public static final String ADD_RATE = "INSERT INTO rate (weight, fare) VALUES (?, ?)";
-        public static final String SELECT_ALL_RATE = "SELECT * FROM rate";
-        public static final String SELECT_RATE_BY_WEIGHT = "SELECT * FROM rate WHERE weight = ?";
-        public static final String UPDATE_RATE = "UPDATE rate SET fare = ? WHERE weight = ?";
-        public static final String DELETE_RATE = "DELETE FROM rate WHERE weight = ?";
-    }
     public static class OrdersQuery {
         public static final String ADD_ORDER = "INSERT INTO orders (id, date, city_from, freights_id, total_cost, delivery_type_id, receiver_info, sender_info, payment_status, execution_status) "
                 + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

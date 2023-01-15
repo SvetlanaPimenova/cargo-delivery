@@ -3,17 +3,19 @@ package ua.pimenova.controller.filter;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.annotation.WebInitParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ua.pimenova.controller.listener.InitListener;
 
 import java.io.IOException;
 
-/* @WebFilter(urlPatterns = {"/*"},
-        initParams = {@WebInitParam(name = "encoding", value = "UTF-8", description = "Encoding Param")})
-*/
 public class EncodingFilter implements Filter {
 
     private String code;
+    private static final Logger logger = LoggerFactory.getLogger(EncodingFilter.class);
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        logger.info("Encoding Filter is initialized");
         code = filterConfig.getInitParameter("encoding");
     }
 

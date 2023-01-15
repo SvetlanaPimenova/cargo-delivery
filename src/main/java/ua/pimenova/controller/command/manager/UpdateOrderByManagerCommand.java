@@ -3,18 +3,22 @@ package ua.pimenova.controller.command.manager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 
 public class UpdateOrderByManagerCommand implements ICommand {
     private final OrderService orderService;
-
+    private static final Logger logger = LoggerFactory.getLogger(UpdateOrderByManagerCommand.class);
     public UpdateOrderByManagerCommand(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -44,10 +48,10 @@ public class UpdateOrderByManagerCommand implements ICommand {
                 }
             }
         } catch (DaoException e) {
-            e.printStackTrace();
-            return request.getContextPath() + ERROR;
+            logger.error(e.getMessage());
         }
-        String errorMessage = "You cannot update a shipment until it would be formed.";
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
+        String errorMessage = ResourceBundle.getBundle("messages", locale).getString("shipment.not.formed.warning");
         request.getSession().setAttribute("errorMessage", errorMessage);
         return request.getContextPath() + ERROR;
     }

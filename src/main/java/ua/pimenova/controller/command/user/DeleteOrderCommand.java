@@ -3,16 +3,22 @@ package ua.pimenova.controller.command.user;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 
 public class DeleteOrderCommand implements ICommand {
     private final OrderService orderService;
+    private static final Logger logger = LoggerFactory.getLogger(DeleteOrderCommand.class);
 
     public DeleteOrderCommand(OrderService orderService) {
         this.orderService = orderService;
@@ -40,10 +46,10 @@ public class DeleteOrderCommand implements ICommand {
                 }
             }
         } catch (DaoException e) {
-            e.printStackTrace();
-            return request.getContextPath() + ERROR;
+            logger.error(e.getMessage());
         }
-        String errorMessage = "You cannot delete a shipment if it has already been formed.";
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
+        String errorMessage = ResourceBundle.getBundle("messages", locale).getString("cannot.delete.warning");
         request.getSession().setAttribute("errorMessage", errorMessage);
         request.getSession().setAttribute("url", ERROR);
         return request.getContextPath() + ERROR;

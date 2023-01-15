@@ -28,10 +28,6 @@ public class Controller extends HttpServlet {
         CommandFactory commandFactory = CommandFactory.getFactory();
         ICommand command = commandFactory.getCommand(req);
         return command.execute(req, resp);
-//        RequestDispatcher dispatcher = req.getRequestDispatcher(page);
-//        if (!page.equals("redirect")) {
-//            dispatcher.forward(req, resp);
-//        }
     }
 }
 

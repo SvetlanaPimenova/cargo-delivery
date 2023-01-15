@@ -95,6 +95,11 @@
     <listener-class>ua.pimenova.controller.listener.InitListener</listener-class>
   </listener>
 
+  <error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/error.jsp</location>
+  </error-page>
+
   <servlet-mapping>
     <servlet-name>default</servlet-name>
     <url-pattern>/resources/*</url-pattern>

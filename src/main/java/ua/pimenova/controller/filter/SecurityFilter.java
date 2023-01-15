@@ -6,6 +6,8 @@ import jakarta.servlet.annotation.WebInitParam;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.dao.impl.UserDaoImpl;
 import ua.pimenova.model.database.entity.User;
@@ -13,19 +15,15 @@ import ua.pimenova.model.database.entity.User;
 import java.io.IOException;
 import java.util.*;
 
-/* @WebFilter(urlPatterns = {"/*"},
-        initParams = {@WebInitParam(name = "user", value = "createOrder orders pageCreate deleteOrder updateOrder_user update_page account top_up transaction"),
-                        @WebInitParam(name = "manager", value = "reports"),
-                        @WebInitParam(name = "common", value = "calculate login logout signup home profile update signup_page")})
-                        */
-
 public class SecurityFilter implements Filter {
     // commands access
     private static Map<User.Role, List<String>> accessMap = new HashMap<>();
     private static List<String> commons = new ArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
 
     @Override
     public void init(FilterConfig config) {
+        logger.info("Security Filter is initialized");
         // roles
         accessMap.put(User.Role.MANAGER, asList(config.getInitParameter("manager")));
         accessMap.put(User.Role.USER, asList(config.getInitParameter("user")));

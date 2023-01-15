@@ -9,10 +9,12 @@ import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class ShowUpdateOrderPageCommand implements ICommand {
     private final OrderService orderService;
-    private boolean isUpdated;
+    private boolean isUpdated = false;
 
     public ShowUpdateOrderPageCommand(OrderService orderService) {
         this.orderService = orderService;
@@ -38,7 +40,8 @@ public class ShowUpdateOrderPageCommand implements ICommand {
             e.printStackTrace();
             return Pages.PAGE_ERROR;
         }
-        String errorMessage = "You cannot modify a shipment if it has already been formed.";
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
+        String errorMessage = ResourceBundle.getBundle("messages", locale).getString("shipment.is.formed.warning");
         request.setAttribute("errorMessage", errorMessage);
         return Pages.PAGE_ERROR;
     }

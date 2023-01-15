@@ -3,6 +3,8 @@ package ua.pimenova.controller.command.manager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.builder.QueryBuilder;
@@ -15,6 +17,7 @@ import java.util.List;
 
 public class GetPackagesCommand implements ICommand {
     private final OrderService orderService;
+    private static final Logger logger = LoggerFactory.getLogger(GetPackagesCommand.class);
     public GetPackagesCommand(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -27,13 +30,13 @@ public class GetPackagesCommand implements ICommand {
         try {
             orders = orderService.getAll(queryBuilder.getQuery());
             noOfRecords = orderService.getNumberOfRows(queryBuilder.getRecordQuery());
+            doPagination(noOfRecords, request);
+            request.setAttribute("shipments", orders);
+            return Pages.PACKAGES;
         } catch (DaoException e) {
-            e.printStackTrace();
-            return Pages.PAGE_ERROR;
+            logger.error(e.getMessage());
         }
-        doPagination(noOfRecords, request);
-        request.setAttribute("shipments", orders);
-        return Pages.PACKAGES;
+        return Pages.PAGE_ERROR;
     }
 
     private void doPagination(int noOfRecords, HttpServletRequest request) {
@@ -61,31 +64,3 @@ public class GetPackagesCommand implements ICommand {
                 .setLimits(request.getParameter("currentPage"), request.getParameter("recordsPerPage"));
     }
 }
-
-
-//        String page = request.getParameter("currentPage");
-//        String records = request.getParameter("recordsPerPage");
-//        if(page == null || records == null) {
-//           page = "1";
-//           records = "4";
-//        }
-//        int currentPage = Integer.parseInt(page);
-//        int recordsPerPage = Integer.parseInt(records);
-//        int offset = (currentPage - 1)*recordsPerPage;
-//        int noOfRecords;
-//        List<Order> orders;
-//
-//        try {
-//            orders = orderService.viewAllOrdersLimited(offset, recordsPerPage);
-//            noOfRecords = orderService.getNumberOfRows();
-//        } catch (DaoException e) {
-//            e.printStackTrace();
-//            return Pages.PAGE_ERROR;
-//        }
-//        int noOfPages = (int)Math.ceil(noOfRecords * 1.0 / recordsPerPage);
-//        String sort = request.getParameter("sort");
-//        sortOrdersList(orders, sort);
-//
-//        request.setAttribute("noOfPages", noOfPages);
-//        request.setAttribute("currentPage", currentPage);
-//        request.setAttribute("recordsPerPage", recordsPerPage);

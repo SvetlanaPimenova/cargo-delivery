@@ -5,6 +5,8 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.model.database.entity.Order;
 
 import java.io.ByteArrayOutputStream;
@@ -15,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class ReportBuilder {
+    private static final Logger logger = LoggerFactory.getLogger(ReportBuilder.class);
     public void reportPdf(HttpServletResponse response, List<Order> list, String parameter) {
         Document document = new Document(PageSize.A4.rotate(), 10, 10, 10, 10);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -46,7 +49,7 @@ public class ReportBuilder {
 
             openInBrowser(response, baos);
         } catch (DocumentException e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage());
         }
     }
 
@@ -67,7 +70,7 @@ public class ReportBuilder {
             os.flush();
             os.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -87,9 +90,6 @@ public class ReportBuilder {
                     table.addCell(new Phrase(order.getExecutionStatus().toString(), font));
                     i.getAndIncrement();
                 });
-//        for(Order order : list) {
-//
-//        }
     }
 
     private void addTableHeader(PdfPTable table) {

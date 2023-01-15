@@ -3,9 +3,10 @@ package ua.pimenova.controller.command.manager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.controller.constants.Pages;
-import ua.pimenova.model.database.builder.QueryBuilder;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.database.entity.Receiver;
 import ua.pimenova.model.database.entity.User;
@@ -25,6 +26,7 @@ public class GetReportsCommand implements ICommand {
     private final OrderService orderService;
     private final UserService userService;
     private final ReceiverService receiverService;
+    private static final Logger logger = LoggerFactory.getLogger(GetReportsCommand.class);
 
     public GetReportsCommand(OrderService orderService, UserService userService, ReceiverService receiverService) {
         this.orderService = orderService;
@@ -67,7 +69,7 @@ public class GetReportsCommand implements ICommand {
         try {
             userShipments = orderService.getAllOrdersBySender(user);
         } catch (DaoException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return userShipments;
     }
@@ -82,12 +84,12 @@ public class GetReportsCommand implements ICommand {
         try {
             date = format.parse(parameter);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         try {
             orders = orderService.getAllOrdersByDate(date);
         } catch (DaoException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         request.setAttribute("parameter", parameter);
         return orders;
@@ -105,7 +107,7 @@ public class GetReportsCommand implements ICommand {
                 orders.addAll(orderService.getAllOrdersByReceiver(receiver));
             }
         } catch (DaoException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         request.setAttribute("parameter", parameter);
         return orders;
@@ -119,7 +121,7 @@ public class GetReportsCommand implements ICommand {
         try {
             orders = orderService.getAllOrdersByCityFrom(parameter);
         } catch (DaoException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         request.setAttribute("parameter", parameter);
         return orders;
@@ -134,7 +136,7 @@ public class GetReportsCommand implements ICommand {
         try {
             user = userService.getByPhone(parameter);
         } catch (DaoException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         request.setAttribute("parameter", parameter);
         return user;

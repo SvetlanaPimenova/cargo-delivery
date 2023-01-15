@@ -4,20 +4,24 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.UserService;
 
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 
 public class UpdateProfileCommand implements ICommand {
-    private UserService userService;
+    private final UserService userService;
     private boolean isUpdated = false;
+    private static final Logger logger = LoggerFactory.getLogger(UpdateProfileCommand.class);
 
     public UpdateProfileCommand(UserService userService) {
         this.userService = userService;
@@ -36,32 +40,28 @@ public class UpdateProfileCommand implements ICommand {
     private String executePost(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         User user = (User) session.getAttribute("user");
-        String path = PROFILE;
         String action = request.getParameter("updateAction");
         switch (action) {
             case "personalData":
                 try {
                     updatePersonalData(request, user);
                 } catch (DaoException e) {
-                    e.printStackTrace();
-                    path = ERROR;
+                    logger.error(e.getMessage());
                 }
             case "contactData":
                 try {
                     updateContactData(request, user);
                 } catch (DaoException e) {
-                    e.printStackTrace();
-                    path = ERROR;
+                    logger.error(e.getMessage());
                 }
             case "passwordData":
                 try {
                     updatePasswordData(request, user);
                 } catch (DaoException e) {
-                    e.printStackTrace();
-                    path = ERROR;
+                    logger.error(e.getMessage());
                 }
         }
-        session.setAttribute("url", path);
+        session.setAttribute("url", PROFILE);
         return request.getContextPath() + UPDATE_PROFILE;
     }
 
@@ -72,10 +72,11 @@ public class UpdateProfileCommand implements ICommand {
         user.setLastname(lastname);
         String message;
         isUpdated = userService.update(user);
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
         if (isUpdated) {
-            message = "Personal data have been successfully changed!";
+            message = ResourceBundle.getBundle("messages", locale).getString("personal.data.changed");
         } else {
-            message = "Personal data have not been changed.";
+            message = ResourceBundle.getBundle("messages", locale).getString("personal.data.not.changed");
         }
         request.getSession().setAttribute("message", message);
     }
@@ -93,10 +94,11 @@ public class UpdateProfileCommand implements ICommand {
         user.setPostalCode(postalCode);
         String message;
         isUpdated = userService.update(user);
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
         if (isUpdated) {
-            message = "Contact data have been successfully changed!";
+            message = ResourceBundle.getBundle("messages", locale).getString("contact.data.changed");
         } else {
-            message = "Contact data have not been changed.";
+            message = ResourceBundle.getBundle("messages", locale).getString("contact.data.not.changed");
         }
         request.getSession().setAttribute("message", message);
     }
@@ -106,10 +108,11 @@ public class UpdateProfileCommand implements ICommand {
         user.setPassword(password);
         String message;
         isUpdated = userService.updatePassword(user);
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
         if (isUpdated) {
-            message = "Password has been successfully changed!";
+            message = ResourceBundle.getBundle("messages", locale).getString("password.changed");
         } else {
-            message = "Password has not been changed.";
+            message = ResourceBundle.getBundle("messages", locale).getString("password.not.changed");
         }
         request.getSession().setAttribute("message", message);
     }

@@ -1,5 +1,7 @@
 package ua.pimenova.model.database.dao.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.model.database.dao.FreightDao;
 import ua.pimenova.model.database.dao.HikariCPDataSource;
 import ua.pimenova.model.database.dao.SqlQuery;
@@ -12,6 +14,7 @@ import java.util.List;
 
 public class FreightDaoImpl implements FreightDao {
     private static FreightDaoImpl instance = null;
+    private static final Logger logger = LoggerFactory.getLogger(FreightDaoImpl.class);
 
     private FreightDaoImpl() {}
 
@@ -31,7 +34,7 @@ public class FreightDaoImpl implements FreightDao {
                 return getFreight(resultSet);
             }
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -60,7 +63,7 @@ public class FreightDaoImpl implements FreightDao {
             ResultSet resultSet = statement.executeQuery(SqlQuery.FreightQuery.SELECT_ALL_FREIGHTS);
             freights = getListOfFreights(freights, resultSet);
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return freights;
@@ -69,7 +72,7 @@ public class FreightDaoImpl implements FreightDao {
     @Override
     public Freight create(Freight freight) throws DaoException {
         try (Connection connection = HikariCPDataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SqlQuery.FreightQuery.ADD_FREIGHT, Statement.RETURN_GENERATED_KEYS);){
+             PreparedStatement statement = connection.prepareStatement(SqlQuery.FreightQuery.ADD_FREIGHT, Statement.RETURN_GENERATED_KEYS)){
             statement.setDouble(1, freight.getWeight());
             statement.setDouble(2, freight.getLength());
             statement.setDouble(3, freight.getWidth());
@@ -83,7 +86,7 @@ public class FreightDaoImpl implements FreightDao {
             }
             return freight;
         } catch (SQLException e) {
-            //           logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -101,7 +104,7 @@ public class FreightDaoImpl implements FreightDao {
             statement.setInt(7, freight.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -113,7 +116,7 @@ public class FreightDaoImpl implements FreightDao {
             statement.setInt(1, freight.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-//            logger.error(e.getMessage());
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -127,6 +130,7 @@ public class FreightDaoImpl implements FreightDao {
             ResultSet resultSet = statement.executeQuery();
             freights = getListOfFreights(freights, resultSet);
         } catch(SQLException e) {
+            logger.error(e.getMessage());
             throw new DaoException(e);
         }
         return freights;

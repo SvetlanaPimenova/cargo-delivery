@@ -42,10 +42,8 @@ public class CalculateCommand implements ICommand {
                 deliveryType, weight);
         settingAttributes(request);
         request.getSession().setAttribute("result", totalCost);
-        String path = HOME;
-        request.getSession().setAttribute("url", path);
+        request.getSession().setAttribute("url", HOME);
         return request.getContextPath() + HOME;
-//        return Pages.PAGE_INDEX;
     }
 
     private void settingAttributes(HttpServletRequest request) {

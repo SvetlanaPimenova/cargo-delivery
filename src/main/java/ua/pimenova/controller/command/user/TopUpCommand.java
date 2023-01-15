@@ -4,8 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.pimenova.controller.command.ICommand;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.UserService;
@@ -15,6 +16,7 @@ import static ua.pimenova.controller.constants.Commands.*;
 
 public class TopUpCommand implements ICommand {
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(TopUpCommand.class);
 
     public TopUpCommand(UserService userService) {
         this.userService = userService;
@@ -38,9 +40,8 @@ public class TopUpCommand implements ICommand {
         try {
             userService.update(user);
         } catch (DaoException e) {
-            e.printStackTrace();
             session.setAttribute("url", ERROR);
-            return request.getContextPath() + ERROR;
+            logger.error(e.getMessage());
         }
         session.setAttribute("url", ACCOUNT);
         return request.getContextPath() + ACCOUNT;

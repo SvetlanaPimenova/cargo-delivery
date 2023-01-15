@@ -21,9 +21,7 @@ public class Calculator {
         rates.put(40.0, 100);
     }
 
-    public Calculator() {
-
-    }
+    private Calculator() {}
 
     public static int getTotalCost(String citiFrom, String cityTo, Freight.FreightType freightType,
                                    ExtraOptions.DeliveryType deliveryType, double weight) {

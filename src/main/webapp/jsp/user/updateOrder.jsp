@@ -67,7 +67,7 @@ body, html {
                     </div>
                     <div class="w3-twothird w3-margin-bottom">
                         <select class="w3-input w3-border" id="freighttype" name="freighttype">
-                            <option value="${currentOrder.freight.type}" disabled selected>${currentOrder.freight.type}</option>
+                            <option value="${currentOrder.freight.type}" selected>${currentOrder.freight.type}</option>
                             <option value="goods"><fmt:message key="calculator.freight.goods"/></option>
                             <option value="glass"><fmt:message key="calculator.freight.glass"/></option>
                             <option value="compact"><fmt:message key="option.filter.freight.compact"/></option>
@@ -80,7 +80,7 @@ body, html {
                     </div>
                     <div class="w3-twothird w3-margin-bottom">
                         <select class="w3-input w3-border" id="deliverytype" name="deliverytype">
-                            <option value="${currentOrder.deliveryType}" disabled selected>${currentOrder.deliveryType}</option>
+                            <option value="${currentOrder.deliveryType}" selected>${currentOrder.deliveryType}</option>
                             <option value="to_the_branch"><fmt:message key="calculator.delivery.branch"/></option>
                             <option value="courier"><fmt:message key="calculator.delivery.courier"/></option>
                         </select>
