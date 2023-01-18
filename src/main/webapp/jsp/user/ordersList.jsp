@@ -176,6 +176,10 @@ body, html {
                                 <input type="hidden" name="order_id" value="${orderId}">
                                 <button class="w3-button"><i class="fa fa-edit"></i></button>
                             </form>
+                            <form action="bill_pdf" method="get" target="_blank">
+                                <input type="hidden" name="order_id" value="${orderId}">
+                                <button class="w3-button"><i class="fa fa-file-pdf-o"></i></button>
+                            </form>
                         </td>
                     </tr>
                 </c:forEach>

@@ -3,8 +3,7 @@ package ua.pimenova.controller.command.manager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.database.entity.Receiver;
@@ -21,12 +20,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class PdfBuilderCommand implements ICommand {
     private final OrderService orderService;
     private final UserService userService;
     private final ReceiverService receiverService;
-    private static final Logger logger = LoggerFactory.getLogger(PdfBuilderCommand.class);
+    private static final Logger LOGGER = Logger.getLogger(PdfBuilderCommand.class);
 
     public PdfBuilderCommand(OrderService orderService, UserService userService, ReceiverService receiverService) {
         this.orderService = orderService;
@@ -41,7 +41,8 @@ public class PdfBuilderCommand implements ICommand {
         List<Order> list = new ArrayList<>();
         User user;
         List<Order> userShipments = new ArrayList<>();
-        ReportBuilder reportBuilder = new ReportBuilder();
+        Locale locale = (Locale) request.getSession().getAttribute("locale");
+        ReportBuilder reportBuilder = new ReportBuilder(locale);
         switch (searchParameter) {
             case "sender":
                 user = searchBySender(parameter);
@@ -66,12 +67,12 @@ public class PdfBuilderCommand implements ICommand {
         try {
             date = format.parse(parameter);
         } catch (ParseException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         try {
             orders = orderService.getAllOrdersByDate(date);
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return orders;
     }
@@ -82,7 +83,7 @@ public class PdfBuilderCommand implements ICommand {
         try {
             orders = orderService.getAllOrdersByCityFrom(parameter);
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return orders;
     }
@@ -98,7 +99,7 @@ public class PdfBuilderCommand implements ICommand {
                 orders.addAll(orderService.getAllOrdersByReceiver(receiver));
             }
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return orders;
     }
@@ -110,7 +111,7 @@ public class PdfBuilderCommand implements ICommand {
         try {
             user = userService.getByPhone(parameter);
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return user;
     }
@@ -119,7 +120,7 @@ public class PdfBuilderCommand implements ICommand {
         try {
             userShipments = orderService.getAllOrdersBySender(user);
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return userShipments;
     }

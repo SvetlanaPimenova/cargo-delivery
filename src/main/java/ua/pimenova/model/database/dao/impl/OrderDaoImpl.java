@@ -1,7 +1,6 @@
 package ua.pimenova.model.database.dao.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.model.database.dao.HikariCPDataSource;
 import ua.pimenova.model.database.dao.OrderDao;
 import ua.pimenova.model.database.dao.SqlQuery;
@@ -18,7 +17,7 @@ public class OrderDaoImpl implements OrderDao {
 
     private FreightDaoImpl freightDao;
     private ReceiverDaoImpl receiverDao;
-    private static final Logger logger = LoggerFactory.getLogger(OrderDaoImpl.class);
+    private static final Logger LOGGER = Logger.getLogger(OrderDaoImpl.class);
 
     private OrderDaoImpl() {
     }
@@ -40,7 +39,7 @@ public class OrderDaoImpl implements OrderDao {
                 return getOrder(resultSet);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -133,7 +132,7 @@ public class OrderDaoImpl implements OrderDao {
             ResultSet resultSet = statement.executeQuery(SqlQuery.OrdersQuery.SELECT_ALL_ORDERS);
             orders = getListOfOrders(orders, resultSet);
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return orders;
@@ -173,7 +172,7 @@ public class OrderDaoImpl implements OrderDao {
             }
             return order;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             try {
                 connection.rollback();
             } catch (SQLException ex) {
@@ -209,7 +208,7 @@ public class OrderDaoImpl implements OrderDao {
             connection.commit();
             return true;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             try {
                 connection.rollback();
             } catch (SQLException ex) {
@@ -241,7 +240,7 @@ public class OrderDaoImpl implements OrderDao {
             connection.commit();
             return true;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             try {
                 connection.rollback();
             } catch (SQLException ex) {
@@ -266,7 +265,7 @@ public class OrderDaoImpl implements OrderDao {
             ResultSet resultSet = statement.executeQuery();
             orders = getListOfOrders(orders, resultSet);
         } catch(SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return orders;
@@ -281,7 +280,7 @@ public class OrderDaoImpl implements OrderDao {
             ResultSet resultSet = statement.executeQuery(SqlQuery.OrdersQuery.SELECT_ALL_ORDERS + query);
             orders = getListOfOrders(orders, resultSet);
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return orders;
@@ -296,7 +295,7 @@ public class OrderDaoImpl implements OrderDao {
             ResultSet resultSet = statement.executeQuery();
             orders = getListOfOrders(orders, resultSet);
         } catch(SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return orders;
@@ -311,7 +310,7 @@ public class OrderDaoImpl implements OrderDao {
             ResultSet resultSet = statement.executeQuery();
             orders = getListOfOrders(orders, resultSet);
         } catch(SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return orders;
@@ -326,7 +325,7 @@ public class OrderDaoImpl implements OrderDao {
             ResultSet resultSet = statement.executeQuery();
             orders = getListOfOrders(orders, resultSet);
         } catch(SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return orders;
@@ -341,7 +340,7 @@ public class OrderDaoImpl implements OrderDao {
                 numOfRows = resultSet.getInt(1);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return numOfRows;

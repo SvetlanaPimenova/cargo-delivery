@@ -2,9 +2,7 @@ package ua.pimenova.controller.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,11 +12,11 @@ import java.util.Locale;
 public class LocaleFilter implements Filter {
     private String defaultLocale;
     private List<String> availableLocales;
-    private static final Logger logger = LoggerFactory.getLogger(LocaleFilter.class);
+    private static final org.apache.log4j.Logger LOGGER = Logger.getLogger(LocaleFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) {
-        logger.info("Locale Filter is initialized");
+        LOGGER.info("Locale Filter is initialized");
         defaultLocale = filterConfig.getInitParameter("defaultLocale");
         availableLocales = Arrays.asList(filterConfig.getInitParameter("availableLocales").split(" "));
     }

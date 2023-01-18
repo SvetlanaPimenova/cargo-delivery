@@ -238,7 +238,7 @@ body, html {
                     <div class="w3-half w3-margin-bottom">
                         <label for="rphone"><fmt:message key="contact.section.phone"/>:</label><br>
                         <input class="w3-input w3-border" type="tel" name="rphone"
-                               id="rphone" pattern="^\+?38?(0\d{2}\d{3}\d{2}\d{2})$" maxlength="13">
+                               id="rphone" pattern="^\+380\d{2}\d{3}\d{2}\d{2}$" maxlength="13">
                     </div>
                     <div class="w3-half w3-margin-bottom">
                         <br>

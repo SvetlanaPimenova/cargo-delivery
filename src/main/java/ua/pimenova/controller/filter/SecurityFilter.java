@@ -1,15 +1,11 @@
 package ua.pimenova.controller.filter;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.annotation.WebInitParam;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.constants.Pages;
-import ua.pimenova.model.database.dao.impl.UserDaoImpl;
 import ua.pimenova.model.database.entity.User;
 
 import java.io.IOException;
@@ -17,13 +13,13 @@ import java.util.*;
 
 public class SecurityFilter implements Filter {
     // commands access
-    private static Map<User.Role, List<String>> accessMap = new HashMap<>();
+    private static final Map<User.Role, List<String>> accessMap = new HashMap<>();
     private static List<String> commons = new ArrayList<>();
-    private static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(SecurityFilter.class);
 
     @Override
     public void init(FilterConfig config) {
-        logger.info("Security Filter is initialized");
+        LOGGER.info("Security Filter is initialized");
         // roles
         accessMap.put(User.Role.MANAGER, asList(config.getInitParameter("manager")));
         accessMap.put(User.Role.USER, asList(config.getInitParameter("user")));

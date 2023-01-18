@@ -50,7 +50,7 @@
     <filter-class>ua.pimenova.controller.filter.SecurityFilter</filter-class>
     <init-param>
       <param-name>user</param-name>
-      <param-value>createOrder orders pageCreate deleteOrder updateOrder_user update_page account top_up transaction</param-value>
+      <param-value>createOrder orders pageCreate deleteOrder updateOrder_user update_page account top_up transaction bill_pdf</param-value>
     </init-param>
     <init-param>
       <param-name>manager</param-name>

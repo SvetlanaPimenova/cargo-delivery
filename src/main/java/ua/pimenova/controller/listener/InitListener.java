@@ -2,30 +2,30 @@ package ua.pimenova.controller.listener;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class InitListener implements ServletContextListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(InitListener.class);
+    private static final Logger LOGGER = Logger.getLogger(InitListener.class);
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        logger.info("Servlet context is initialized");
+        LOGGER.info("Servlet context is initialized");
         initCommandFactory();
     }
 
     private void initCommandFactory() {
         try {
             Class.forName("ua.pimenova.controller.command.CommandFactory");
-            logger.info("Command factory is initialized");
+            LOGGER.info("Command factory is initialized");
         } catch (ClassNotFoundException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        logger.info("Servlet context is destroyed");
+        LOGGER.info("Servlet context is destroyed");
     }
 }

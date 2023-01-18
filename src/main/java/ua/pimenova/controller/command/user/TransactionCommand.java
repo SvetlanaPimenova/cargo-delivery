@@ -4,8 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.database.entity.User;
@@ -23,8 +22,7 @@ public class TransactionCommand implements ICommand {
     private final OrderService orderService;
     private final UserService userService;
     private boolean isUpdated;
-    private static final Logger logger = LoggerFactory.getLogger(TransactionCommand.class);
-
+    private static final Logger LOGGER = Logger.getLogger(TransactionCommand.class);
     public TransactionCommand(OrderService orderService, UserService userService) {
         this.orderService = orderService;
         this.userService = userService;
@@ -72,7 +70,7 @@ public class TransactionCommand implements ICommand {
                 return request.getContextPath() + TRANSACTION;
             }
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         session.setAttribute("url", ERROR);
         return request.getContextPath() + ERROR;

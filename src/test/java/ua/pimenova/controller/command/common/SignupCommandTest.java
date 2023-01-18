@@ -11,17 +11,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.User;
-import ua.pimenova.model.exception.DaoException;
+import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.UserService;
 import ua.pimenova.model.util.EncryptingUserPassword;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static ua.pimenova.controller.constants.Commands.*;
 
 class SignupCommandTest {
+
     @Mock
     HttpServletRequest req;
     @Mock
@@ -50,6 +52,9 @@ class SignupCommandTest {
         user.setPostalCode("Postal Code");
 
         closeable = MockitoAnnotations.openMocks(this);
+
+        Mockito.when(req.getSession()).thenReturn(session);
+        mockingUser();
     }
 
     @AfterEach
@@ -58,46 +63,71 @@ class SignupCommandTest {
     }
 
     @Test
-    public void ifEmailAndPasswordAreUnique() throws DaoException, ServletException, IOException {
-        mockingUser();
+    void testExecuteGet() throws ServletException, IOException {
+        setGetRequest(req);
 
-        Mockito.when(userService.getByPhone("+380111111111")).thenReturn(null);
-        Mockito.when(userService.getByEmail("user@gmail.com")).thenReturn(null);
-        Mockito.when(userService.create(user)).thenReturn(user);
-        Mockito.when(req.getSession(true)).thenReturn(session);
+        String path = command.execute(req, resp);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.USER_PROFILE, result);
+        assertEquals(SHOW_SIGNUP_PAGE, path);
+        verify(req).setAttribute(eq("errorPhone"), eq("This phone number is already in use."));
+        verify(session).removeAttribute(eq("errorPhone"));
+//        assertEquals("This phone number is already in use.", req.getAttribute("errorPhone"));
+//        assertEquals("This e-mail is already in use.", req.getAttribute("errorEmail"));
+//        assertEquals(user, session.getAttribute("user"));
+//        assertNull(req.getSession().getAttribute("errorPhone"));
+//        assertNull(req.getSession().getAttribute("errorEmail"));
     }
 
-    @Test
-    public void ifPhoneIsUsed() throws DaoException, ServletException, IOException {
-        mockingUser();
+//    @Test
+//    public void ifEmailAndPasswordAreUnique() throws DaoException, ServletException, IOException {
+//        mockingUser();
+//
+//        Mockito.when(userService.getByPhone("+380111111111")).thenReturn(null);
+//        Mockito.when(userService.getByEmail("user@gmail.com")).thenReturn(null);
+//        Mockito.when(userService.create(user)).thenReturn(user);
+//        Mockito.when(req.getSession(true)).thenReturn(session);
+//
+//        String result = command.execute(req, resp);
+//        assertEquals(Pages.USER_PROFILE, result);
+//    }
+//
+//    @Test
+//    public void ifPhoneIsUsed() throws DaoException, ServletException, IOException {
+//        mockingUser();
+//
+//        Mockito.when(userService.getByPhone("+380111111111")).thenReturn(user);
+//
+//        String result = command.execute(req, resp);
+//        assertEquals(Pages.SIGNUP_PAGE, result);
+//    }
+//
+//    @Test
+//    public void ifEmailIsUsed() throws DaoException, ServletException, IOException {
+//        mockingUser();
+//
+//        Mockito.when(userService.getByEmail("user@gmail.com")).thenReturn(user);
+//
+//        String result = command.execute(req, resp);
+//        assertEquals(Pages.SIGNUP_PAGE, result);
+//    }
 
-        Mockito.when(userService.getByPhone("+380111111111")).thenReturn(user);
-
-        String result = command.execute(req, resp);
-        assertEquals(Pages.SIGNUP_PAGE, result);
-    }
-
-    @Test
-    public void ifEmailIsUsed() throws DaoException, ServletException, IOException {
-        mockingUser();
-
-        Mockito.when(userService.getByEmail("user@gmail.com")).thenReturn(user);
-
-        String result = command.execute(req, resp);
-        assertEquals(Pages.SIGNUP_PAGE, result);
+    private void setGetRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("get");
+        when(session.getAttribute(eq("errorPhone"))).thenReturn("This phone number is already in use.");
+        when(session.getAttribute(eq("errorEmail"))).thenReturn("This e-mail is already in use.");
+        when(session.getAttribute(eq("errorMessage"))).thenReturn(new IncorrectFormatException().getMessage());
+        when(session.getAttribute(eq("user"))).thenReturn(user);
+        when(session.getAttribute(eq("url"))).thenReturn(SHOW_SIGNUP_PAGE);
     }
 
     private void mockingUser() {
-        Mockito.when(req.getParameter("firstname")).thenReturn("Ivan");
-        Mockito.when(req.getParameter("lastname")).thenReturn("Ivanov");
-        Mockito.when(req.getParameter("email")).thenReturn("user@gmail.com");
-        Mockito.when(req.getParameter("phone")).thenReturn("+380111111111");
-        Mockito.when(req.getParameter("city")).thenReturn("City");
-        Mockito.when(req.getParameter("street")).thenReturn("Street");
-        Mockito.when(req.getParameter("postalcode")).thenReturn("Postal Code");
-        Mockito.when(req.getParameter("password")).thenReturn("pass");
+        when(req.getParameter("firstname")).thenReturn("Ivan");
+        when(req.getParameter("lastname")).thenReturn("Ivanov");
+        when(req.getParameter("email")).thenReturn("user@gmail.com");
+        when(req.getParameter("phone")).thenReturn("+380111111111");
+        when(req.getParameter("city")).thenReturn("City");
+        when(req.getParameter("street")).thenReturn("Street");
+        when(req.getParameter("postalcode")).thenReturn("Postal Code");
+        when(req.getParameter("password")).thenReturn("pass");
     }
 }

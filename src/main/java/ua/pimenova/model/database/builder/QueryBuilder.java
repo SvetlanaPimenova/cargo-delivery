@@ -63,14 +63,26 @@ public class QueryBuilder {
     }
 
     public QueryBuilder setLimits(String page, String records) {
-        if (page != null) {
+        if (page != null && isPositiveInt(page)) {
             currentPage = Integer.parseInt(page);
         }
-        if (records != null) {
+        if (records != null && isPositiveInt(records)) {
             recordsPerPage = Integer.parseInt(records);
         }
         offset = (currentPage - 1)*recordsPerPage;
         return this;
+    }
+
+    private boolean isPositiveInt(String intString) {
+        try {
+            int i = Integer.parseInt(intString);
+            if (i < 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 
     public String getQuery() {

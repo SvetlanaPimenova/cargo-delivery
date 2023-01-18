@@ -4,22 +4,21 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.*;
 import ua.pimenova.model.exception.DaoException;
+import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.OrderService;
 import ua.pimenova.model.util.Calculator;
 import java.io.IOException;
 import java.util.Date;
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
-
+import static ua.pimenova.model.util.Validator.*;
 public class CreateOrderCommand implements ICommand {
     private final OrderService orderService;
-    private static final Logger logger = LoggerFactory.getLogger(CreateOrderCommand.class);
-
+    private static final Logger LOGGER = Logger.getLogger(CreateOrderCommand.class);
     public CreateOrderCommand(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -42,15 +41,24 @@ public class CreateOrderCommand implements ICommand {
             Receiver receiver = getFullReceiver(request);
             Order order = getFullOrder(request, freight, receiver, user);
             try {
+                validateReceiver(receiver);
                 order = orderService.create(order);
-            } catch (DaoException e) {
-                logger.error(e.getMessage());
+            } catch (DaoException | IncorrectFormatException e) {
+                request.getSession().setAttribute("errorMessage", e.getMessage());
+                request.getSession().setAttribute("url", ERROR);
+                LOGGER.error(e.getMessage());
             }
             path = SHOW_PAGE_CREATE_ORDER;
             request.getSession().setAttribute("newOrder", order);
             request.getSession().setAttribute("url", path);
         }
         return request.getContextPath() + path;
+    }
+
+    private void validateReceiver(Receiver receiver) throws IncorrectFormatException {
+        validateName(receiver.getFirstname());
+        validateName(receiver.getLastname());
+        validatePhone(receiver.getPhone());
     }
 
     private Freight getFullFreight(HttpServletRequest request) {

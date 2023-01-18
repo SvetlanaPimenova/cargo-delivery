@@ -1,7 +1,6 @@
 package ua.pimenova.model.database.dao.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.model.database.dao.FreightDao;
 import ua.pimenova.model.database.dao.HikariCPDataSource;
 import ua.pimenova.model.database.dao.SqlQuery;
@@ -14,8 +13,7 @@ import java.util.List;
 
 public class FreightDaoImpl implements FreightDao {
     private static FreightDaoImpl instance = null;
-    private static final Logger logger = LoggerFactory.getLogger(FreightDaoImpl.class);
-
+    private static final Logger LOGGER = Logger.getLogger(FreightDaoImpl.class);
     private FreightDaoImpl() {}
 
     public static synchronized FreightDaoImpl getInstance() {
@@ -34,7 +32,7 @@ public class FreightDaoImpl implements FreightDao {
                 return getFreight(resultSet);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -63,7 +61,7 @@ public class FreightDaoImpl implements FreightDao {
             ResultSet resultSet = statement.executeQuery(SqlQuery.FreightQuery.SELECT_ALL_FREIGHTS);
             freights = getListOfFreights(freights, resultSet);
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return freights;
@@ -86,7 +84,7 @@ public class FreightDaoImpl implements FreightDao {
             }
             return freight;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -104,7 +102,7 @@ public class FreightDaoImpl implements FreightDao {
             statement.setInt(7, freight.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -116,7 +114,7 @@ public class FreightDaoImpl implements FreightDao {
             statement.setInt(1, freight.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -130,7 +128,7 @@ public class FreightDaoImpl implements FreightDao {
             ResultSet resultSet = statement.executeQuery();
             freights = getListOfFreights(freights, resultSet);
         } catch(SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return freights;

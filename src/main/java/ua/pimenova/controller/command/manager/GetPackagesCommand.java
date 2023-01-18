@@ -3,8 +3,7 @@ package ua.pimenova.controller.command.manager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.builder.QueryBuilder;
@@ -17,7 +16,7 @@ import java.util.List;
 
 public class GetPackagesCommand implements ICommand {
     private final OrderService orderService;
-    private static final Logger logger = LoggerFactory.getLogger(GetPackagesCommand.class);
+    private static final Logger LOGGER = Logger.getLogger(GetPackagesCommand.class);
     public GetPackagesCommand(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -34,7 +33,7 @@ public class GetPackagesCommand implements ICommand {
             request.setAttribute("shipments", orders);
             return Pages.PACKAGES;
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return Pages.PAGE_ERROR;
     }

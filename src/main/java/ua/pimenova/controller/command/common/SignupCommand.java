@@ -4,19 +4,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
+import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.UserService;
+import ua.pimenova.model.util.UserValidator;
 
 import java.io.IOException;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
+import static ua.pimenova.model.util.Validator.*;
 
 public class SignupCommand implements ICommand {
     private final UserService userService;
@@ -24,7 +24,8 @@ public class SignupCommand implements ICommand {
     public SignupCommand(UserService userService) {
         this.userService = userService;
     }
-    private static final Logger logger = LoggerFactory.getLogger(SignupCommand.class);
+
+    private static final Logger LOGGER = Logger.getLogger(SignupCommand.class);
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -32,39 +33,33 @@ public class SignupCommand implements ICommand {
     }
 
     private String executeGet(HttpServletRequest request) {
-        getAttributeFromSessionToRequest(request, "errorPhone");
-        getAttributeFromSessionToRequest(request, "errorEmail");
+//        getAttributeFromSessionToRequest(request, "errorPhone");
+//        getAttributeFromSessionToRequest(request, "errorEmail");
+        getAttributeFromSessionToRequest(request, "errorMessage");
         return getURL(request);
     }
 
     private String executePost(HttpServletRequest request) {
-        User user = getUser(request);
-        Locale locale = (Locale) request.getSession().getAttribute("locale");
+        User user;
         try {
-            if (userService.getByPhone(user.getPhone()) != null) {
-                String errorPhone = ResourceBundle.getBundle("messages", locale).getString("signup.phone.in.use");
-                request.getSession().setAttribute("errorPhone", errorPhone);
-                request.getSession().setAttribute("url", SHOW_SIGNUP_PAGE);
-                return request.getContextPath() + SHOW_SIGNUP_PAGE;
-            }
-            if (userService.getByEmail(user.getEmail()) != null) {
-                String errorEmail = ResourceBundle.getBundle("messages", locale).getString("signup.email.in.use");
-                request.getSession().setAttribute("errorEmail", errorEmail);
-                request.getSession().setAttribute("url", SHOW_SIGNUP_PAGE);
-                return request.getContextPath() + SHOW_SIGNUP_PAGE;
-            }
+            user = getUser(request);
+            UserValidator validator = new UserValidator(userService);
+            validator.validate(user, request);
             userService.create(user);
-        } catch (DaoException e) {
-            logger.error(e.getMessage());
+        } catch (DaoException | IncorrectFormatException e) {
+            request.getSession().setAttribute("errorMessage", e.getMessage());
+            request.getSession().setAttribute("url", SHOW_SIGNUP_PAGE);
+            LOGGER.error(e.getMessage());
+            return request.getContextPath() + SIGN_UP;
         }
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(false);
         session.setAttribute("user", user);
         session.setAttribute("userRole", user.getRole());
         request.getSession().setAttribute("url", PROFILE);
-        return request.getContextPath() + PROFILE;
+        return request.getContextPath() + SIGN_UP;
     }
 
-    private User getUser(HttpServletRequest request) {
+    private User getUser(HttpServletRequest request) throws IncorrectFormatException {
         String firstName = request.getParameter("firstname").strip();
         String lastName = request.getParameter("lastname").strip();
         String email = request.getParameter("email").strip();

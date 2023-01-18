@@ -142,6 +142,14 @@ body, html {
                 </div>
             </c:if>
             <c:if test="${requestScope.user != null}">
+                <c:set var="searchParameter" value="${searchParameter}" scope="request"/>
+                <c:set var="parameter" value="${parameter}" scope="request"/>
+                <form action="pdf" method="get" target="_blank">
+                    <input type="hidden" name="searchParameter" value="${searchParameter}"/>
+                    <input type="hidden" name="parameter" value="${parameter}"/>
+                    <button type="submit" class="w3-button"><i class="fa fa-file-pdf-o"></i> <fmt:message key="button.download"/></button>
+                </form>
+                <br>
                 <div class="w3-container w3-padding-16 w3-grayscale w3-card w3-center">
                     <div class="w3-container">
                         <div class="w3-third">

@@ -3,8 +3,7 @@ package ua.pimenova.controller.command.user;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.exception.DaoException;
@@ -18,7 +17,7 @@ import static ua.pimenova.controller.constants.Commands.*;
 
 public class DeleteOrderCommand implements ICommand {
     private final OrderService orderService;
-    private static final Logger logger = LoggerFactory.getLogger(DeleteOrderCommand.class);
+    private static final Logger LOGGER = Logger.getLogger(DeleteOrderCommand.class);
 
     public DeleteOrderCommand(OrderService orderService) {
         this.orderService = orderService;
@@ -46,7 +45,7 @@ public class DeleteOrderCommand implements ICommand {
                 }
             }
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         Locale locale = (Locale) request.getSession().getAttribute("locale");
         String errorMessage = ResourceBundle.getBundle("messages", locale).getString("cannot.delete.warning");

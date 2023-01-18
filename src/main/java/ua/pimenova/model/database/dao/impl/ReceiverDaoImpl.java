@@ -1,7 +1,6 @@
 package ua.pimenova.model.database.dao.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.model.database.dao.HikariCPDataSource;
 import ua.pimenova.model.database.dao.ReceiverDao;
 import ua.pimenova.model.database.dao.SqlQuery;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public class ReceiverDaoImpl implements ReceiverDao {
     private static ReceiverDaoImpl instance = null;
-    private static final Logger logger = LoggerFactory.getLogger(ReceiverDaoImpl.class);
+    private static final Logger LOGGER = Logger.getLogger(ReceiverDaoImpl.class);
     private ReceiverDaoImpl() {}
 
     public static synchronized ReceiverDaoImpl getInstance() {
@@ -34,7 +33,7 @@ public class ReceiverDaoImpl implements ReceiverDao {
                 return getReceiver(resultSet);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -63,7 +62,7 @@ public class ReceiverDaoImpl implements ReceiverDao {
             ResultSet resultSet = statement.executeQuery(SqlQuery.ReceiverQuery.SELECT_ALL_RECEIVERS);
             receivers = getListOfReceivers(receivers, resultSet);
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return receivers;
@@ -100,7 +99,7 @@ public class ReceiverDaoImpl implements ReceiverDao {
             }
             return receiver;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -118,7 +117,7 @@ public class ReceiverDaoImpl implements ReceiverDao {
             statement.setInt(7, receiver.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -130,7 +129,7 @@ public class ReceiverDaoImpl implements ReceiverDao {
             statement.setInt(1, receiver.getId());
             return  statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -145,7 +144,7 @@ public class ReceiverDaoImpl implements ReceiverDao {
                 return getReceiver(resultSet);
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return null;
@@ -160,7 +159,7 @@ public class ReceiverDaoImpl implements ReceiverDao {
             ResultSet resultSet = statement.executeQuery();
             receivers = getListOfReceivers(receivers, resultSet);
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             throw new DaoException(e);
         }
         return receivers;

@@ -1,59 +1,94 @@
 package ua.pimenova.model.util;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.properties.*;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.model.database.entity.Order;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import static com.itextpdf.kernel.colors.ColorConstants.LIGHT_GRAY;
+
 public class ReportBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(ReportBuilder.class);
-    public void reportPdf(HttpServletResponse response, List<Order> list, String parameter) {
-        Document document = new Document(PageSize.A4.rotate(), 10, 10, 10, 10);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            PdfWriter.getInstance(document, baos);
-            document.open();
+    private static final org.apache.log4j.Logger LOGGER = Logger.getLogger(ReportBuilder.class);
+    private final Locale locale;
 
-            Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 14, Font.BOLD);
-            Font main = new Font(Font.FontFamily.TIMES_ROMAN, 11, Font.NORMAL);
-
-            Paragraph title = new Paragraph("Dispatch report: " + parameter, titleFont);
-            Chapter chapter = new Chapter(title, 1);
-            chapter.setNumberDepth(0);
-
-            Section section = chapter.addSection("", 0);
-
-            PdfPTable table = new PdfPTable(11);
-            table.setSpacingBefore(25);
-            table.setSpacingAfter(25);
-            float[] columnWidths = new float[]{7f, 25f, 20f, 20f, 40f, 15f, 40f, 40f, 40f, 25f, 40f};
-            table.setWidths(columnWidths);
-            table.setWidthPercentage(95);
-
-            addTableHeader(table);
-            addRows(list, main, table);
-            section.add(table);
-            document.add(chapter);
-            document.close();
-
-            openInBrowser(response, baos);
-        } catch (DocumentException e) {
-            logger.error(e.getMessage());
-        }
+    public ReportBuilder(Locale locale) {
+        this.locale = locale;
     }
 
-    private void openInBrowser(HttpServletResponse response, ByteArrayOutputStream baos) {
+    public void billPdf(HttpServletResponse response, Order order) {
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages", locale);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(outputStream);
+        PdfDocument pdfDocument = new PdfDocument(writer);
+        Document document = new Document(pdfDocument, PageSize.A4);
+        PdfFont font = getFont();
+        if (font != null) {
+            document.setFont(font);
+        }
+        String title = resourceBundle.getString("bill.title");
+        document.add(getReportTitle(title));
+        document.add(getHeader(order.getOrderDate(), resourceBundle));
+        document.add(getEmptyLine());
+        document.add(getSenderInfo(order, resourceBundle));
+        document.close();
+        openInBrowser(response, outputStream);
+    }
+
+    private Table getSenderInfo(Order order, ResourceBundle resourceBundle) {
+        Cell header = new Cell();
+        header.setBackgroundColor(LIGHT_GRAY);
+        header.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        header.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        header.add(new Paragraph(resourceBundle.getString("option.sender")));
+        return new Table(1)
+                .addCell(header)
+                .addCell(order.getSender().toString());
+    }
+
+    private Table getReceiverInfo(Order order) {
+        return new Table(1).addCell(order.getSender().toString());
+    }
+
+    private Paragraph getHeader(Date orderDate, ResourceBundle resourceBundle) {
+        Date paymentTerm = new Date(orderDate.getTime() + 14*24*60*60*1000);
+        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+        return new Paragraph(new Text(resourceBundle.getString("bill.date") + " " + orderDate + "\n"
+        + resourceBundle.getString("bill.term") + " " + formatDate.format(paymentTerm)))
+                .setFontSize(11)
+                .setTextAlignment(TextAlignment.RIGHT);
+    }
+
+    public void reportPdf(HttpServletResponse response, List<Order> list, String parameter) {
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("messages", locale);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Document document = getDocument(outputStream);
+        String reportTitle = resourceBundle.getString("report.title") + ": " + parameter;
+        document.add(getReportTitle(reportTitle));
+        document.add(getTable(list, resourceBundle));
+        document.close();
+        openInBrowser(response, outputStream);
+    }
+
+    private void openInBrowser(HttpServletResponse response, ByteArrayOutputStream outputStream) {
         // setting some response headers
         response.setHeader("Expires", "0");
         response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
@@ -61,47 +96,89 @@ public class ReportBuilder {
         // setting the content type
         response.setContentType("application/pdf");
         // the content length
-        response.setContentLength(baos.size());
+        response.setContentLength(outputStream.size());
         // write ByteArrayOutputStream to the ServletOutputStream
         OutputStream os;
         try {
             os = response.getOutputStream();
-            baos.writeTo(os);
+            outputStream.writeTo(os);
             os.flush();
             os.close();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
-    private void addRows(List<Order> list, Font font, PdfPTable table) {
-        AtomicInteger i = new AtomicInteger(1);
-        list.forEach(order -> {
-                    table.addCell(new Phrase(String.valueOf(i.get()), font));
-                    table.addCell(new Phrase(order.getOrderDate().toString(), font));
-                    table.addCell(new Phrase(order.getCityFrom(), font));
-                    table.addCell(new Phrase(order.getReceiver().getCity(), font));
-                    table.addCell(new Phrase(order.getFreight().toString(), font));
-                    table.addCell(new Phrase(String.valueOf(order.getTotalCost()), font));
-                    table.addCell(new Phrase(order.getDeliveryType().toString(), font));
-                    table.addCell(new Phrase(order.getSender().toString(), font));
-                    table.addCell(new Phrase(order.getReceiver().toString(), font));
-                    table.addCell(new Phrase(order.getPaymentStatus().toString(), font));
-                    table.addCell(new Phrase(order.getExecutionStatus().toString(), font));
-                    i.getAndIncrement();
+    private Document getDocument(ByteArrayOutputStream outputStream) {
+        PdfWriter writer = new PdfWriter(outputStream);
+        PdfDocument pdfDocument = new PdfDocument(writer);
+        Document document = new Document(pdfDocument, PageSize.A4.rotate());
+        document.setMargins(10, 10, 10, 10);
+        PdfFont font = getFont();
+        if (font != null) {
+            document.setFont(font);
+        }
+        return document;
+    }
+
+    private PdfFont getFont() {
+        try {
+            return PdfFontFactory.createFont("timesNewRoman.ttf");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            return null;
+        }
+    }
+
+    private Paragraph getReportTitle(String title) {
+        return new Paragraph(new Text(title.toUpperCase()))
+                .setFontSize(14)
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER);
+    }
+
+    private Paragraph getEmptyLine() {
+        return new Paragraph(new Text("\n"));
+    }
+
+    private Table getTable(List<Order> list, ResourceBundle resourceBundle) {
+        Table table = new Table(new float[]{7f, 30f, 20f, 20f, 40f, 15f, 40f, 35f, 40f, 25f, 40f});
+        table.setMarginBottom(25);
+        table.setMarginTop(25);
+        addTableHeader(table, resourceBundle);
+        addRows(list, table);
+        return table;
+    }
+
+    private void addTableHeader(Table table, ResourceBundle resourceBundle) {
+        Stream.of("number.character", "table.shipment.date", "calculator.label.from", "calculator.label.to",
+                        "table.freight.info", "table.total.cost", "calculator.label.delivery", "option.sender",
+                        "table.receiver", "option.filter.payment", "option.filter.execution")
+                .forEach(columnTitle -> {
+                    Cell header = new Cell();
+                    header.setBackgroundColor(LIGHT_GRAY);
+                    header.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    header.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    header.add(new Paragraph(resourceBundle.getString(columnTitle)));
+                    table.addCell(header);
                 });
     }
 
-    private void addTableHeader(PdfPTable table) {
-        Stream.of("#", "Shipment date", "From", "To", "Freight info", "Total cost, UAH",
-                        "Delivery type", "Sender", "Receiver", "Payment status", "Execution status")
-                .forEach(columnTitle -> {
-                    PdfPCell header = new PdfPCell();
-                    header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                    header.setPhrase(new Phrase(columnTitle));
-                    header.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    header.setVerticalAlignment(Element.ALIGN_CENTER);
-                    table.addCell(header);
+    private void addRows(List<Order> list, Table table) {
+        AtomicInteger i = new AtomicInteger(1);
+        list.forEach(order -> {
+                    table.addCell(String.valueOf(i.get())).setFontSize(11);
+                    table.addCell(order.getOrderDate().toString()).setFontSize(11);
+                    table.addCell(order.getCityFrom()).setFontSize(11);
+                    table.addCell(order.getReceiver().getCity()).setFontSize(11);
+                    table.addCell(order.getFreight().toString()).setFontSize(11);
+                    table.addCell(String.valueOf(order.getTotalCost())).setFontSize(11);
+                    table.addCell(order.getDeliveryType().toString()).setFontSize(11);
+                    table.addCell(order.getSender().toString()).setFontSize(11);
+                    table.addCell(order.getReceiver().toString()).setFontSize(11);
+                    table.addCell(order.getPaymentStatus().toString()).setFontSize(11);
+                    table.addCell(order.getExecutionStatus().toString()).setFontSize(11);
+                    i.getAndIncrement();
                 });
     }
 }

@@ -4,8 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
@@ -21,8 +20,7 @@ import static ua.pimenova.controller.constants.Commands.*;
 public class UpdateProfileCommand implements ICommand {
     private final UserService userService;
     private boolean isUpdated = false;
-    private static final Logger logger = LoggerFactory.getLogger(UpdateProfileCommand.class);
-
+    private static final Logger LOGGER = Logger.getLogger(UpdateProfileCommand.class);
     public UpdateProfileCommand(UserService userService) {
         this.userService = userService;
     }
@@ -46,19 +44,19 @@ public class UpdateProfileCommand implements ICommand {
                 try {
                     updatePersonalData(request, user);
                 } catch (DaoException e) {
-                    logger.error(e.getMessage());
+                    LOGGER.error(e.getMessage());
                 }
             case "contactData":
                 try {
                     updateContactData(request, user);
                 } catch (DaoException e) {
-                    logger.error(e.getMessage());
+                    LOGGER.error(e.getMessage());
                 }
             case "passwordData":
                 try {
                     updatePasswordData(request, user);
                 } catch (DaoException e) {
-                    logger.error(e.getMessage());
+                    LOGGER.error(e.getMessage());
                 }
         }
         session.setAttribute("url", PROFILE);

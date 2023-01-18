@@ -1,21 +1,17 @@
 package ua.pimenova.controller.filter;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.annotation.WebInitParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ua.pimenova.controller.listener.InitListener;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
 public class EncodingFilter implements Filter {
 
     private String code;
-    private static final Logger logger = LoggerFactory.getLogger(EncodingFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(EncodingFilter.class);
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        logger.info("Encoding Filter is initialized");
+    public void init(FilterConfig filterConfig) {
+        LOGGER.info("Encoding Filter is initialized");
         code = filterConfig.getInitParameter("encoding");
     }
 

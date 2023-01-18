@@ -3,10 +3,8 @@ package ua.pimenova.controller.command.user;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import ua.pimenova.controller.command.ICommand;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.ExtraOptions;
 import ua.pimenova.model.database.entity.Freight;
 import ua.pimenova.model.database.entity.Order;
@@ -26,8 +24,7 @@ public class UpdateOrderByUserCommand implements ICommand {
     private final FreightService freightService;
     private final ReceiverService receiverService;
     private boolean isUpdated;
-    private static final Logger logger = LoggerFactory.getLogger(UpdateOrderByUserCommand.class);
-
+    private static final Logger LOGGER = Logger.getLogger(UpdateOrderByUserCommand.class);
     public UpdateOrderByUserCommand(OrderService orderService, FreightService freightService, ReceiverService receiverService) {
         this.orderService = orderService;
         this.freightService = freightService;
@@ -71,14 +68,13 @@ public class UpdateOrderByUserCommand implements ICommand {
             request.getSession().setAttribute("url", SHOW_PAGE_UPDATE_ORDER);
             return request.getContextPath() + UPDATE_ORDER_BY_USER;
         } catch (DaoException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         request.getSession().setAttribute("url", ERROR);
         return request.getContextPath() + ERROR;
     }
 
     private Freight setNewFreight(HttpServletRequest request, Freight freight) {
-        String type = request.getParameter("freighttype").toUpperCase();
         freight.setType(Freight.FreightType.valueOf(request.getParameter("freighttype").toUpperCase()));
         freight.setWeight(Double.parseDouble(request.getParameter("weight")));
         freight.setLength(Double.parseDouble(request.getParameter("length")));

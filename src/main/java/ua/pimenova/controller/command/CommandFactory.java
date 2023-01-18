@@ -42,7 +42,6 @@ public class CommandFactory {
         commands.put("home", new ShowHomePageCommand());
         commands.put("profile", new ShowProfileCommand());
         commands.put("update", new UpdateProfileCommand(userService));
-        commands.put("pdf", new PdfBuilderCommand(orderService, userService, receiverService));
         commands.put("error", new ShowErrorPageCommand());
 
         //user commands
@@ -56,12 +55,14 @@ public class CommandFactory {
         commands.put("account", new ShowAccountCommand());
         commands.put("top_up", new TopUpCommand(userService));
         commands.put("transaction", new TransactionCommand(orderService, userService));
+        commands.put("bill_pdf", new PdfBillDownloadCommand(orderService));
 
         //manager
         commands.put("reports", new GetReportsCommand(orderService, userService, receiverService));
         commands.put("packages", new GetPackagesCommand(orderService));
         commands.put("updateShipment_page", new ShowUpdateShipmentCommand(orderService));
         commands.put("updateStatus", new UpdateOrderByManagerCommand(orderService));
+        commands.put("pdf", new PdfBuilderCommand(orderService, userService, receiverService));
     }
 
     public static synchronized CommandFactory getFactory() {

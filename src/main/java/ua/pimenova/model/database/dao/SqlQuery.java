@@ -76,6 +76,8 @@ public class SqlQuery {
                 "JOIN users AS u ON o.sender_info = u.id WHERE u.id = ?";
         public static final String UPDATE_ORDER = "UPDATE orders SET delivery_type_id = ?, total_cost = ?, payment_status = ?, execution_status = ? WHERE id = ?";
         public static final String DELETE_ORDER = "DELETE FROM orders WHERE id = ?";
-        public static final String NUMBER_OF_ROWS = "SELECT COUNT(id) FROM orders";
+        public static final String NUMBER_OF_ROWS = "SELECT COUNT(1) FROM orders AS o JOIN freights AS f ON o.freights_id = f.id "
+                + "JOIN freight_type AS ft ON f.freight_type_id = ft.id JOIN receivers AS r ON o.receiver_info = r.id " +
+                "JOIN users AS u ON o.sender_info = u.id";
     }
 }

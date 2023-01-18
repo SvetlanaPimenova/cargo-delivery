@@ -145,6 +145,9 @@ body, html {
 
 <!-- Sign-up window -->
 <div class="w3-container w3-padding-16 w3-grayscale w3-card w3-center">
+    <c:if test="${errorMessage != null}">
+        <p class="w3-left" style="color: red;">${errorMessage}</p>
+    </c:if><br>
     <form action="signup" method="post" id="regForm">
         <div class="w3-container w3-padding-16">
             <p class="w3-center w3-large"><fmt:message key="signup.text"/></p>
@@ -159,13 +162,13 @@ body, html {
             <p class="w3-left"><fmt:message key="signup.label.contact"/>:</p>
             <fmt:message key="login.placeholder.email" var="placeholderEmail"/>
             <input class="w3-input w3-border" type="text" placeholder="${placeholderEmail}" name="email"
-                   id="email" required>
+                   id="email" pattern="^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,6}$" required>
             <c:if test="${errorEmail != null}">
                 <p class="w3-left" style="color: red;">${errorEmail}</p>
             </c:if><br>
             <fmt:message key="signup.placeholder.phone" var="placeholderPhone"/>
             <input class="w3-input w3-border" type="tel" placeholder="${placeholderPhone}" name="phone"
-                   id="phone" pattern="^\+?380\d{2}\d{3}\d{2}\d{2}$" maxlength="13"
+                   id="phone" pattern="^\+380\d{2}\d{3}\d{2}\d{2}$" maxlength="13"
                    title="+380XXXXXXXXX" required>
             <c:if test="${errorPhone != null}">
                 <p class="w3-left" style="color: red;">${errorPhone}</p>
