@@ -4,19 +4,18 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import ua.pimenova.model.database.entity.User;
+import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.UserService;
-import ua.pimenova.model.util.EncryptingUserPassword;
+import ua.pimenova.model.util.UserValidator;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,26 +34,15 @@ class SignupCommandTest {
     @InjectMocks
     SignupCommand command;
     User user = new User();
+    @Mock
+    UserValidator validator = new UserValidator(userService);
     private AutoCloseable closeable;
 
     @BeforeEach
     public void setUp() {
-        user.setId(1);
-        user.setPassword(EncryptingUserPassword.encryptPassword("pass"));
-        user.setFirstname("Ivan");
-        user.setLastname("Ivanov");
-        user.setPhone("+380111111111");
-        user.setEmail("user@gmail.com");
-        user.setAccount(0);
-        user.setRole(User.Role.USER);
-        user.setCity("City");
-        user.setStreet("Street");
-        user.setPostalCode("Postal Code");
-
         closeable = MockitoAnnotations.openMocks(this);
 
-        Mockito.when(req.getSession()).thenReturn(session);
-        mockingUser();
+        when(req.getSession()).thenReturn(session);
     }
 
     @AfterEach
@@ -69,53 +57,43 @@ class SignupCommandTest {
         String path = command.execute(req, resp);
 
         assertEquals(SHOW_SIGNUP_PAGE, path);
-        verify(req).setAttribute(eq("errorPhone"), eq("This phone number is already in use."));
-        verify(session).removeAttribute(eq("errorPhone"));
-//        assertEquals("This phone number is already in use.", req.getAttribute("errorPhone"));
-//        assertEquals("This e-mail is already in use.", req.getAttribute("errorEmail"));
-//        assertEquals(user, session.getAttribute("user"));
-//        assertNull(req.getSession().getAttribute("errorPhone"));
-//        assertNull(req.getSession().getAttribute("errorEmail"));
+        verify(req).setAttribute(eq("errorMessage"), eq("error"));
+        verify(session).removeAttribute(eq("errorMessage"));
+        assertEquals(user, session.getAttribute("user"));
     }
 
-//    @Test
-//    public void ifEmailAndPasswordAreUnique() throws DaoException, ServletException, IOException {
-//        mockingUser();
-//
-//        Mockito.when(userService.getByPhone("+380111111111")).thenReturn(null);
-//        Mockito.when(userService.getByEmail("user@gmail.com")).thenReturn(null);
-//        Mockito.when(userService.create(user)).thenReturn(user);
-//        Mockito.when(req.getSession(true)).thenReturn(session);
-//
-//        String result = command.execute(req, resp);
-//        assertEquals(Pages.USER_PROFILE, result);
-//    }
-//
-//    @Test
-//    public void ifPhoneIsUsed() throws DaoException, ServletException, IOException {
-//        mockingUser();
-//
-//        Mockito.when(userService.getByPhone("+380111111111")).thenReturn(user);
-//
-//        String result = command.execute(req, resp);
-//        assertEquals(Pages.SIGNUP_PAGE, result);
-//    }
-//
-//    @Test
-//    public void ifEmailIsUsed() throws DaoException, ServletException, IOException {
-//        mockingUser();
-//
-//        Mockito.when(userService.getByEmail("user@gmail.com")).thenReturn(user);
-//
-//        String result = command.execute(req, resp);
-//        assertEquals(Pages.SIGNUP_PAGE, result);
-//    }
+    @Test
+    void testSuccessfulExecutePost() throws IncorrectFormatException, DaoException, ServletException, IOException {
+        setPostRequest(req);
+
+//        when(userService.create(user)).thenReturn(user);
+//        when(session.getAttribute(eq("user"))).thenReturn(user);
+//        when(session.getAttribute(eq("userRole"))).thenReturn(user.getRole());
+//        when(session.getAttribute(eq("url"))).thenReturn(PROFILE);
+
+        doNothing().when(validator).validate(isA(User.class), isA(HttpServletRequest.class));
+        when(userService.create(user)).thenReturn(user);
+        when(req.getContextPath()).thenReturn("/delivery/");
+
+        String path = command.execute(req, resp);
+
+//        assertEquals(session.getAttribute("user"), user);
+//        assertEquals(session.getAttribute("userRole"), user.getRole());
+//        assertEquals(session.getAttribute("url"), PROFILE);
+        verify(session).setAttribute(eq("user"), eq(user));
+        verify(session).setAttribute(eq("userRole"), eq(user.getRole()));
+        verify(session).setAttribute(eq("url"), eq(PROFILE));
+        assertEquals(req.getContextPath() + SIGN_UP, path);
+    }
+
+    private void setPostRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("post");
+        mockingUser();
+    }
 
     private void setGetRequest(HttpServletRequest request) {
         when(request.getMethod()).thenReturn("get");
-        when(session.getAttribute(eq("errorPhone"))).thenReturn("This phone number is already in use.");
-        when(session.getAttribute(eq("errorEmail"))).thenReturn("This e-mail is already in use.");
-        when(session.getAttribute(eq("errorMessage"))).thenReturn(new IncorrectFormatException().getMessage());
+        when(session.getAttribute(eq("errorMessage"))).thenReturn(new IncorrectFormatException("error").getMessage());
         when(session.getAttribute(eq("user"))).thenReturn(user);
         when(session.getAttribute(eq("url"))).thenReturn(SHOW_SIGNUP_PAGE);
     }
@@ -128,6 +106,7 @@ class SignupCommandTest {
         when(req.getParameter("city")).thenReturn("City");
         when(req.getParameter("street")).thenReturn("Street");
         when(req.getParameter("postalcode")).thenReturn("Postal Code");
-        when(req.getParameter("password")).thenReturn("pass");
+        when(req.getParameter("password")).thenReturn("Password1");
+        when(req.getParameter("reppass")).thenReturn("Password1");
     }
 }

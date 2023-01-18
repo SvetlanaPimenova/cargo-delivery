@@ -33,8 +33,6 @@ public class SignupCommand implements ICommand {
     }
 
     private String executeGet(HttpServletRequest request) {
-//        getAttributeFromSessionToRequest(request, "errorPhone");
-//        getAttributeFromSessionToRequest(request, "errorEmail");
         getAttributeFromSessionToRequest(request, "errorMessage");
         return getURL(request);
     }
@@ -52,10 +50,10 @@ public class SignupCommand implements ICommand {
             LOGGER.error(e.getMessage());
             return request.getContextPath() + SIGN_UP;
         }
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
         session.setAttribute("user", user);
         session.setAttribute("userRole", user.getRole());
-        request.getSession().setAttribute("url", PROFILE);
+        session.setAttribute("url", PROFILE);
         return request.getContextPath() + SIGN_UP;
     }
 

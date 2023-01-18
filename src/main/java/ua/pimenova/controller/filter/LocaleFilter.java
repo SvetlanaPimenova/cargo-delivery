@@ -12,7 +12,7 @@ import java.util.Locale;
 public class LocaleFilter implements Filter {
     private String defaultLocale;
     private List<String> availableLocales;
-    private static final org.apache.log4j.Logger LOGGER = Logger.getLogger(LocaleFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(LocaleFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) {

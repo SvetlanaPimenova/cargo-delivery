@@ -50,7 +50,7 @@ public class SecurityFilter implements Filter {
             return true;
         }
 
-        HttpSession session = httpRequest.getSession(false);
+        HttpSession session = httpRequest.getSession();
         if (session == null) {
             return true;
         }
