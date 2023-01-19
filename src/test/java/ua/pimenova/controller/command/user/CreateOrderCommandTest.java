@@ -21,12 +21,15 @@ import java.io.IOException;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static ua.pimenova.controller.constants.Commands.SHOW_PAGE_CREATE_ORDER;
 
 class CreateOrderCommandTest {
     @Mock
-    HttpServletRequest req;
+    HttpServletRequest request;
     @Mock
-    HttpServletResponse resp;
+    HttpServletResponse response;
     @Mock
     OrderService orderService;
     @Mock
@@ -63,42 +66,42 @@ class CreateOrderCommandTest {
 
     @Test
     public void createOrderTest() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getSession(false)).thenReturn(session);
-        Mockito.when(session.getAttribute("user")).thenReturn(sender);
+        setPostRequest(request);
         mockingFreight();
         mockingReceiver();
-        Mockito.when(req.getParameter("cityfrom")).thenReturn("City");
-        Mockito.when(req.getParameter("deliverytype")).thenReturn("TO_THE_BRANCH");
-        Mockito.when(orderService.create(testOrder)).thenReturn(testOrder);
+        when(request.getParameter("cityfrom")).thenReturn("City");
+        when(request.getParameter("deliverytype")).thenReturn("TO_THE_BRANCH");
+        doReturn(testOrder).when(orderService).create(isA(Order.class));
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.CREATE_ORDER, result);
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("newOrder", testOrder);
+        verify(session).setAttribute("url", SHOW_PAGE_CREATE_ORDER);
+        assertEquals(request.getContextPath() + SHOW_PAGE_CREATE_ORDER, path);
     }
 
-    @Test
-    public void ifUserIsNull() throws ServletException, IOException {
-        Mockito.when(req.getSession(false)).thenReturn(session);
-        Mockito.when(session.getAttribute("user")).thenReturn(null);
-
-        String result = command.execute(req, resp);
-        assertEquals(Pages.PAGE_ERROR, result);
+    private void setPostRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("post");
+        when(request.getSession(false)).thenReturn(session);
+        when(request.getContextPath()).thenReturn("delivery");
+        when(session.getAttribute("user")).thenReturn(sender);
     }
 
     private void mockingFreight() {
-        Mockito.when(req.getParameter("freighttype")).thenReturn("GOODS");
-        Mockito.when(req.getParameter("weight")).thenReturn("5.0");
-        Mockito.when(req.getParameter("length")).thenReturn("10.0");
-        Mockito.when(req.getParameter("width")).thenReturn("10.0");
-        Mockito.when(req.getParameter("height")).thenReturn("10.0");
-        Mockito.when(req.getParameter("cost")).thenReturn("0");
+        Mockito.when(request.getParameter("freighttype")).thenReturn("GOODS");
+        Mockito.when(request.getParameter("weight")).thenReturn("5.0");
+        Mockito.when(request.getParameter("length")).thenReturn("10.0");
+        Mockito.when(request.getParameter("width")).thenReturn("10.0");
+        Mockito.when(request.getParameter("height")).thenReturn("10.0");
+        Mockito.when(request.getParameter("cost")).thenReturn("0");
     }
 
     private void mockingReceiver() {
-        Mockito.when(req.getParameter("rfname")).thenReturn("Ivan");
-        Mockito.when(req.getParameter("rlname")).thenReturn("Ivanov");
-        Mockito.when(req.getParameter("rphone")).thenReturn("+380111111111");
-        Mockito.when(req.getParameter("cityto")).thenReturn("City");
-        Mockito.when(req.getParameter("rstreet")).thenReturn("Street");
-        Mockito.when(req.getParameter("rpcode")).thenReturn("Postal Code");
+        Mockito.when(request.getParameter("rfname")).thenReturn("Ivan");
+        Mockito.when(request.getParameter("rlname")).thenReturn("Ivanov");
+        Mockito.when(request.getParameter("rphone")).thenReturn("+380111111111");
+        Mockito.when(request.getParameter("cityto")).thenReturn("City");
+        Mockito.when(request.getParameter("rstreet")).thenReturn("Street");
+        Mockito.when(request.getParameter("rpcode")).thenReturn("Postal Code");
     }
 }

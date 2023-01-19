@@ -9,24 +9,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.*;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static ua.pimenova.controller.constants.Commands.*;
 
 class DeleteOrderCommandTest {
 
     @Mock
-    HttpServletRequest req;
+    HttpServletRequest request;
     @Mock
-    HttpServletResponse resp;
+    HttpServletResponse response;
     @Mock
     OrderService orderService;
     @Mock
@@ -59,31 +62,54 @@ class DeleteOrderCommandTest {
     }
 
     @Test
-    public void deleteOrderTest() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getParameter("order_id")).thenReturn("1");
-        Mockito.when(orderService.getByID(1)).thenReturn(testOrder);
-        Mockito.when(orderService.delete(testOrder)).thenReturn(true);
+    void testExecuteGet() throws ServletException, IOException {
+        setGetRequest(request);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.ORDERS_LIST_PAGE, result);
+        String path = command.execute(request, response);
+
+        assertEquals(ERROR, path);
+        verify(request).setAttribute(eq("errorMessage"), eq("error"));
+        verify(session).removeAttribute(eq("errorMessage"));
     }
 
     @Test
-    public void ifOrderIsNull() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getParameter("order_id")).thenReturn("1");
-        Mockito.when(orderService.getByID(1)).thenReturn(null);
+    void testExecuteSuccessfulPost() throws DaoException, ServletException, IOException {
+        setPostRequest(request);
+        when(request.getParameter("order_id")).thenReturn("1");
+        when(orderService.getByID(1)).thenReturn(testOrder);
+        when(orderService.delete(testOrder)).thenReturn(true);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.PAGE_ERROR, result);
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("url", GET_ORDERS);
+        assertEquals(request.getContextPath() + GET_ORDERS, path);
     }
 
     @Test
-    public void ifOrderIsFormed() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getParameter("order_id")).thenReturn("1");
+    void testOrderIsFormed() throws DaoException, ServletException, IOException {
+        setPostRequest(request);
+        when(session.getAttribute("locale")).thenReturn(new Locale("en"));
+        when(request.getParameter("order_id")).thenReturn("1");
         testOrder.setExecutionStatus(Order.ExecutionStatus.FORMED);
-        Mockito.when(orderService.getByID(1)).thenReturn(testOrder);
+        when(orderService.getByID(1)).thenReturn(testOrder);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.PAGE_ERROR, result);
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("errorMessage", "You cannot delete a shipment if it has already been formed.");
+        verify(session).setAttribute("url", ERROR);
+        assertEquals(request.getContextPath() + ERROR, path);
+    }
+
+    private void setGetRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("get");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute(eq("url"))).thenReturn(ERROR);
+        when(session.getAttribute("errorMessage")).thenReturn("error");
+    }
+
+    private void setPostRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("post");
+        when(request.getSession()).thenReturn(session);
+        when(request.getContextPath()).thenReturn("delivery");
     }
 }

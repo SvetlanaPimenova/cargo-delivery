@@ -9,24 +9,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
-import ua.pimenova.model.service.OrderService;
 import ua.pimenova.model.service.UserService;
 import ua.pimenova.model.util.EncryptingUserPassword;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static ua.pimenova.controller.constants.Commands.*;
 
 class TopUpCommandTest {
     @Mock
-    HttpServletRequest req;
+    HttpServletRequest request;
     @Mock
-    HttpServletResponse resp;
+    HttpServletResponse response;
     @Mock
     UserService userService;
     @Mock
@@ -38,7 +38,7 @@ class TopUpCommandTest {
     @BeforeEach
     public void setUp() {
         user.setId(1);
-        user.setPassword(EncryptingUserPassword.encryptPassword("pass"));
+        user.setPassword(EncryptingUserPassword.encryptPassword("Password1"));
         user.setFirstname("Ivan");
         user.setLastname("Ivanov");
         user.setPhone("+380111111111");
@@ -58,13 +58,50 @@ class TopUpCommandTest {
     }
 
     @Test
-    public void topUpAccountTest() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getSession(false)).thenReturn(session);
-        Mockito.when(session.getAttribute("user")).thenReturn(user);
-        Mockito.when(req.getParameter("account")).thenReturn("100");
-        Mockito.when(userService.update(user)).thenReturn(true);
+    void testExecuteGet() throws ServletException, IOException {
+        setGetRequest(request);
+        String path = command.execute(request, response);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.ACCOUNT_PAGE, result);
+        assertEquals(ACCOUNT, path);
+    }
+
+    @Test
+    void testExecutePost() throws ServletException, IOException, DaoException {
+        setPostRequest(request);
+        when(request.getContextPath()).thenReturn("delivery");
+        when(session.getAttribute("user")).thenReturn(user);
+        when(request.getParameter("account")).thenReturn("100");
+        when(userService.update(user)).thenReturn(true);
+
+        String path = command.execute(request, response);
+
+        assertEquals(100, user.getAccount());
+        verify(session).setAttribute("url", ACCOUNT);
+        assertEquals(request.getContextPath() + ACCOUNT, path);
+    }
+
+    @Test
+    void testExceptionInPost() throws DaoException, ServletException, IOException {
+        setPostRequest(request);
+        when(request.getContextPath()).thenReturn("delivery");
+        when(session.getAttribute("user")).thenReturn(user);
+        when(request.getParameter("account")).thenReturn("100");
+        when(userService.update(user)).thenThrow(DaoException.class);
+
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("url", ERROR);
+        assertEquals(request.getContextPath() + ERROR, path);
+    }
+
+    private void setPostRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("post");
+        when(request.getSession(false)).thenReturn(session);
+    }
+
+    private void setGetRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("get");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute(eq("url"))).thenReturn(ACCOUNT);
     }
 }

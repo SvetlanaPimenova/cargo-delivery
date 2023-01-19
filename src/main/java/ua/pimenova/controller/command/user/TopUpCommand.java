@@ -40,6 +40,7 @@ public class TopUpCommand implements ICommand {
         } catch (DaoException e) {
             session.setAttribute("url", ERROR);
             LOGGER.error(e.getMessage());
+            return request.getContextPath() + ERROR;
         }
         session.setAttribute("url", ACCOUNT);
         return request.getContextPath() + ACCOUNT;

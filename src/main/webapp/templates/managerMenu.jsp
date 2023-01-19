@@ -1,10 +1,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@taglib prefix="ctg" uri="/WEB-INF/tld/custom.tld" %>
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="messages"/>
 
 <style>
+.w3-bar .w3-button {
+  padding: 16px;
+  display: inline;
+}
 
 .dropdown .dropbtn {
   font-size: 16px;
@@ -62,6 +67,7 @@
         </div>
         <!-- Right-sided navbar links -->
         <div class="w3-right w3-hide-small" style="display: inline;">
+            <p class="w3-bar-item" style="padding:0px; margin-right:20px;"><b><fmt:message key="user.greeting"/><ctg:greeting name="${user.firstname}" /></b></p>
             <a href="packages" class="w3-button w3-bar-item" style="display: inline;"><fmt:message key="manager.packages"/></a>
             <a href="reports" class="w3-button w3-bar-item" style="display: inline;"><fmt:message key="manager.reports"/></a>
             <a href="profile" class="w3-bar-item w3-button"><i class="fa fa-user-circle-o"></i> <fmt:message key="profile"/></a>

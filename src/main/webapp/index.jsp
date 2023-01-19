@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core" %>
 <%@taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@taglib prefix="ctg" uri="/WEB-INF/tld/custom.tld" %>
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="messages"/>
 
@@ -147,6 +148,7 @@ body, html {
             <a href="#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> <fmt:message key="contact"/></a>
             <c:choose>
                 <c:when test="${sessionScope.user != null}">
+                    <p class="w3-bar-item" style="padding:0px; margin-right:20px; margin-left:20px;"><b><fmt:message key="user.greeting"/><ctg:greeting name="${user.firstname}" /></b></p>
                     <a href="profile" class="w3-button w3-bar-item"><i class="fa fa-user-circle-o"></i> <fmt:message key="profile"/></a>
                 </c:when>
                 <c:otherwise>

@@ -44,13 +44,13 @@ public class CreateOrderCommand implements ICommand {
                 validateReceiver(receiver);
                 order = orderService.create(order);
             } catch (DaoException | IncorrectFormatException e) {
-                request.getSession().setAttribute("errorMessage", e.getMessage());
-                request.getSession().setAttribute("url", ERROR);
+                session.setAttribute("errorMessage", e.getMessage());
+                session.setAttribute("url", ERROR);
                 LOGGER.error(e.getMessage());
             }
             path = SHOW_PAGE_CREATE_ORDER;
-            request.getSession().setAttribute("newOrder", order);
-            request.getSession().setAttribute("url", path);
+            session.setAttribute("newOrder", order);
+            session.setAttribute("url", path);
         }
         return request.getContextPath() + path;
     }

@@ -65,7 +65,7 @@ class SignupCommandTest {
     @Test
     void testSuccessfulExecutePost() throws IncorrectFormatException, DaoException, ServletException, IOException {
         setPostRequest(req);
-
+        mockingUser();
 //        when(userService.create(user)).thenReturn(user);
 //        when(session.getAttribute(eq("user"))).thenReturn(user);
 //        when(session.getAttribute(eq("userRole"))).thenReturn(user.getRole());
@@ -88,7 +88,6 @@ class SignupCommandTest {
 
     private void setPostRequest(HttpServletRequest request) {
         when(request.getMethod()).thenReturn("post");
-        mockingUser();
     }
 
     private void setGetRequest(HttpServletRequest request) {

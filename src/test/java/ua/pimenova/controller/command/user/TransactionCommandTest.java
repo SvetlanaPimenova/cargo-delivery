@@ -19,15 +19,18 @@ import ua.pimenova.model.service.UserService;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static ua.pimenova.controller.constants.Commands.*;
 
 class TransactionCommandTest {
 
     @Mock
-    HttpServletRequest req;
+    HttpServletRequest request;
     @Mock
-    HttpServletResponse resp;
+    HttpServletResponse response;
     @Mock
     OrderService orderService;
     @Mock
@@ -65,27 +68,67 @@ class TransactionCommandTest {
     }
 
     @Test
-    public void transactionTest() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getSession(false)).thenReturn(session);
-        Mockito.when(session.getAttribute("user")).thenReturn(sender);
-        Mockito.when(req.getParameter("order_id")).thenReturn("1");
-        Mockito.when(orderService.getByID(1)).thenReturn(testOrder);
-        Mockito.when(userService.update(sender)).thenReturn(true);
-        Mockito.when(orderService.update(testOrder)).thenReturn(true);
+    void testExecuteGet() throws ServletException, IOException {
+        setGetRequest(request);
+        when(request.getAttribute("order_id")).thenReturn("1");
+        when(request.getAttribute("isUpdated")).thenReturn("true");
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.UPDATE_ORDER_PAGE, result);
+        String path = command.execute(request, response);
+
+        verify(request).setAttribute(eq("order_id"), eq("1"));
+        verify(session).removeAttribute(eq("order_id"));
+        verify(request).setAttribute(eq("isUpdated"), eq("true"));
+        verify(session).removeAttribute(eq("isUpdated"));
+
+        String expectedPath = SHOW_PAGE_UPDATE_ORDER + "?order_id=1&isUpdated=true";
+        assertEquals(expectedPath, path);
+    }
+
+    @Test
+    void testExecutePost() throws DaoException, ServletException, IOException {
+        setPostRequest(request);
+        when(orderService.getByID(1)).thenReturn(testOrder);
+        when(userService.update(sender)).thenReturn(true);
+        when(orderService.update(testOrder)).thenReturn(true);
+
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("isUpdated", "true");
+        verify(session).setAttribute("currentOrder", testOrder);
+        verify(session).setAttribute("order_id", "1");
+        verify(session).setAttribute("url", SHOW_PAGE_UPDATE_ORDER);
+        assertEquals(request.getContextPath() + TRANSACTION, path);
     }
 
     @Test
     public void notEnoughFunds() throws DaoException, ServletException, IOException {
+        setPostRequest(request);
         sender.setAccount(0);
-        Mockito.when(req.getSession(false)).thenReturn(session);
-        Mockito.when(session.getAttribute("user")).thenReturn(sender);
-        Mockito.when(req.getParameter("order_id")).thenReturn("1");
-        Mockito.when(orderService.getByID(1)).thenReturn(testOrder);
+        when(orderService.getByID(1)).thenReturn(testOrder);
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("locale")).thenReturn(new Locale("en"));
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.PAGE_ERROR, result);
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("errorMessage", "Your account does not have enough funds for debiting. Please top up your account!");
+        verify(session).setAttribute("url", ERROR);
+        assertEquals(request.getContextPath() + ERROR, path);
+    }
+
+    private void setPostRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("post");
+        when(request.getContextPath()).thenReturn("delivery");
+        when(request.getSession(false)).thenReturn(session);
+        when(session.getAttribute("user")).thenReturn(sender);
+        when(request.getParameter("order_id")).thenReturn("1");
+    }
+
+    private void setGetRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("get");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("order_id")).thenReturn("1");
+        when(session.getAttribute("isUpdated")).thenReturn("true");
+        when(session.getAttribute(eq("url"))).thenReturn(SHOW_PAGE_UPDATE_ORDER);
+        when(session.getAttribute("errorMessage")).thenReturn(null);
     }
 }
