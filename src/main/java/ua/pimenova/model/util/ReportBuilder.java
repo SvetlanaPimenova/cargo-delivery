@@ -44,13 +44,61 @@ public class ReportBuilder {
         if (font != null) {
             document.setFont(font);
         }
+        setDocumentContent(order, resourceBundle, document);
+        document.close();
+        openInBrowser(response, outputStream);
+    }
+
+    private void setDocumentContent(Order order, ResourceBundle resourceBundle, Document document) {
         String title = resourceBundle.getString("bill.title");
         document.add(getReportTitle(title));
         document.add(getHeader(order.getOrderDate(), resourceBundle));
         document.add(getEmptyLine());
         document.add(getSenderInfo(order, resourceBundle));
-        document.close();
-        openInBrowser(response, outputStream);
+        document.add(getReceiverInfo(order, resourceBundle));
+        document.add(getServiceTable(order, resourceBundle));
+        document.add(getFooter(resourceBundle));
+    }
+
+    private Paragraph getFooter(ResourceBundle resourceBundle) {
+        return new Paragraph(new Text(resourceBundle.getString("bill.issued"))).setTextAlignment(TextAlignment.RIGHT);
+    }
+
+    private Table getServiceTable(Order order, ResourceBundle resourceBundle) {
+        Table table = new Table(new float[]{15f, 90f, 20f, 20f, 30f, 20f});
+        table.setWidth(UnitValue.createPercentValue(95));
+        table.setMarginBottom(25);
+        table.setMarginTop(25);
+        addServiceHeader(table, resourceBundle);
+        addServiceRow(order, table, resourceBundle);
+        return table;
+    }
+
+    private void addServiceRow(Order order, Table table, ResourceBundle resourceBundle) {
+        String serviceInfo = resourceBundle.getString("delivery.service") + "\n"
+                + resourceBundle.getString("table.shipment.date") + ": " + order.getOrderDate() + "\n"
+                + resourceBundle.getString("calculator.label.from") + ": " + order.getCityFrom() + "\n"
+                + resourceBundle.getString("calculator.label.delivery") + ": " + order.getDeliveryType() + "\n"
+                + resourceBundle.getString("table.freight.info") + ":\n" + order.getFreight().toString();
+        table.addCell("1");
+        table.addCell(serviceInfo);
+        table.addCell(resourceBundle.getString("table.service"));
+        table.addCell("1");
+        table.addCell("20%");
+        table.addCell(String.valueOf(order.getTotalCost()));
+    }
+
+    private void addServiceHeader(Table table, ResourceBundle resourceBundle) {
+        Stream.of("number.character", "bill.table.service", "bill.table.unit", "bill.table.quantity",
+                        "bill.table.vat", "table.total.cost")
+                .forEach(columnTitle -> {
+                    Cell header = new Cell();
+                    header.setBackgroundColor(LIGHT_GRAY);
+                    header.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    header.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    header.add(new Paragraph(resourceBundle.getString(columnTitle)));
+                    table.addCell(header);
+                });
     }
 
     private Table getSenderInfo(Order order, ResourceBundle resourceBundle) {
@@ -61,11 +109,20 @@ public class ReportBuilder {
         header.add(new Paragraph(resourceBundle.getString("option.sender")));
         return new Table(1)
                 .addCell(header)
-                .addCell(order.getSender().toString());
+                .addCell(order.getSender().toString())
+                .setWidth(UnitValue.createPercentValue(95));
     }
 
-    private Table getReceiverInfo(Order order) {
-        return new Table(1).addCell(order.getSender().toString());
+    private Table getReceiverInfo(Order order, ResourceBundle resourceBundle) {
+        Cell header = new Cell();
+        header.setBackgroundColor(LIGHT_GRAY);
+        header.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        header.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        header.add(new Paragraph(resourceBundle.getString("table.receiver")));
+        return new Table(1)
+                .addCell(header)
+                .addCell(order.getReceiver().toString())
+                .setWidth(UnitValue.createPercentValue(95));
     }
 
     private Paragraph getHeader(Date orderDate, ResourceBundle resourceBundle) {

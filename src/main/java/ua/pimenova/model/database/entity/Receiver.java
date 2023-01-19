@@ -81,7 +81,8 @@ public class Receiver {
     @Override
     public String toString() {
         return firstname + " " + lastname+ ",\n" +
-                phone + ",\n" + street + ", " + postal_code;
+                phone + ",\n" + city + ",\n"
+                + street + ", " + postal_code;
     }
 
     public static class ReceiverFields {
