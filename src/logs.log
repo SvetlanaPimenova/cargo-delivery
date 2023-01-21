@@ -1,6 +1,0 @@
-2023-01-18 16:53 [ INFO]              InitListener:    13 - Servlet context is initialized
-2023-01-18 16:53 [ INFO]              InitListener:    20 - Command factory is initialized
-2023-01-18 16:53 [ INFO]            EncodingFilter:    14 - Encoding Filter is initialized
-2023-01-18 16:53 [ INFO]            SecurityFilter:    22 - Security Filter is initialized
-2023-01-18 16:53 [ INFO]              LocaleFilter:    19 - Locale Filter is initialized
-2023-01-18 16:55 [ INFO]              InitListener:    29 - Servlet context is destroyed

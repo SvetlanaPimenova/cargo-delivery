@@ -9,23 +9,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import ua.pimenova.controller.constants.Pages;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.UserService;
 import ua.pimenova.model.util.EncryptingUserPassword;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+import static ua.pimenova.controller.constants.Commands.*;
+
 
 public class LoginCommandTest {
     @Mock
-    HttpServletRequest req;
+    HttpServletRequest request;
     @Mock
-    HttpServletResponse resp;
+    HttpServletResponse response;
     @Mock
     UserService userService;
     @Mock
@@ -56,45 +58,58 @@ public class LoginCommandTest {
     }
 
     @Test
-    public void ifUserIsUser() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getParameter("emaillogin")).thenReturn("user@gmail.com");
-        Mockito.when(req.getParameter("passlogin")).thenReturn("pass");
-        Mockito.when(userService.getUserByEmailAndPassword("user@gmail.com", "pass")).thenReturn(user);
-        Mockito.when(req.getSession(false)).thenReturn(session);
+    void testExecuteGet() throws ServletException, IOException {
+        setGetRequest(request);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.USER_PROFILE, result);
+        String path = command.execute(request, response);
+
+        verify(request).setAttribute(eq("errorMessage"), eq("Either username or password is wrong."));
+        verify(session).removeAttribute(eq("errorMessage"));
+        assertEquals(ERROR, path);
     }
 
     @Test
-    public void ifUserIsAdmin() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getParameter("emaillogin")).thenReturn("manager@gmail.com");
-        Mockito.when(req.getParameter("passlogin")).thenReturn("pass");
-        Mockito.when(userService.getUserByEmailAndPassword("manager@gmail.com", "pass")).thenReturn(manager);
-        Mockito.when(req.getSession(false)).thenReturn(session);
+    void testExecutePost() throws DaoException, ServletException, IOException {
+        setPostRequest(request);
+        when(request.getParameter("emaillogin")).thenReturn("user@gmail.com");
+        when(request.getParameter("passlogin")).thenReturn("pass");
+        when(userService.getUserByEmailAndPassword("user@gmail.com", "pass")).thenReturn(user);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.MANAGER_PROFILE, result);
-    }
-    @Test
-    public void ifUserIsBlank() throws ServletException, IOException, DaoException {
-        Mockito.when(req.getParameter("emaillogin")).thenReturn(null);
-        Mockito.when(req.getParameter("passlogin")).thenReturn(null);
-        Mockito.when(userService.getUserByEmailAndPassword(null, null)).thenReturn(null);
-        Mockito.when(req.getSession()).thenReturn(session);
-        String result = command.execute(req, resp);
-        assertEquals(Pages.PAGE_ERROR, result);
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("user", user);
+        verify(session).setAttribute("userRole", user.getRole());
+        verify(session).setAttribute("url", PROFILE);
+
+        assertEquals(request.getContextPath() + PROFILE, path);
     }
 
     @Test
-    public void ifPasswordOrEmailIsIncorrect() throws DaoException, ServletException, IOException {
-        Mockito.when(req.getParameter("emaillogin")).thenReturn("admin@mail.com");
-        Mockito.when(req.getParameter("passlogin")).thenReturn("1234");
-        Mockito.when(userService.getUserByEmailAndPassword("admin@mail.com", "1234")).thenReturn(null);
-        Mockito.when(req.getSession()).thenReturn(session);
+    void testIfPasswordOrEmailIsIncorrect() throws DaoException, ServletException, IOException {
+        setPostRequest(request);
+        when(request.getParameter("emaillogin")).thenReturn("admin@mail.com");
+        when(request.getParameter("passlogin")).thenReturn("1234");
+        when(userService.getUserByEmailAndPassword("admin@mail.com", "1234")).thenReturn(null);
 
-        String result = command.execute(req, resp);
-        assertEquals(Pages.PAGE_ERROR, result);
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("errorMessage", "Either username or password is wrong.");
+        assertEquals(request.getContextPath() + ERROR, path);
+    }
+
+
+    private void setPostRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("post");
+        when(request.getSession()).thenReturn(session);
+        when(request.getContextPath()).thenReturn("delivery");
+        when(session.getAttribute("locale")).thenReturn(new Locale("en"));
+    }
+
+    private void setGetRequest(HttpServletRequest request) {
+        when(request.getMethod()).thenReturn("get");
+        when(request.getSession()).thenReturn(session);
+        when(session.getAttribute("errorMessage")).thenReturn("Either username or password is wrong.");
+        when(session.getAttribute("url")).thenReturn(ERROR);
     }
 
 }

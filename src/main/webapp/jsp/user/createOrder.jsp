@@ -93,6 +93,9 @@ body, html {
                 <div class="w3-row-padding w3-margin-bottom">
                     <h4 class="w3-left"><fmt:message key="shipping.options"/></h4><br>
                 </div>
+                <c:if test="${errorMessage != null}">
+                    <p class="w3-left" style="color: red;">${errorMessage}</p>
+                </c:if><br>
                 <div class="w3-row-padding">
                     <div class="w3-third w3-margin-bottom">
                         <label><fmt:message key="calculator.section.route"/></label>

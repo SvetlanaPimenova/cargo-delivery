@@ -10,13 +10,12 @@ import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.UserService;
-import ua.pimenova.model.util.UserValidator;
+import ua.pimenova.model.util.validator.UserValidator;
 
 import java.io.IOException;
 
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
-import static ua.pimenova.model.util.Validator.*;
 
 public class SignupCommand implements ICommand {
     private final UserService userService;
@@ -38,23 +37,22 @@ public class SignupCommand implements ICommand {
     }
 
     private String executePost(HttpServletRequest request) {
-        User user;
         try {
-            user = getUser(request);
+            User user = getUser(request);
             UserValidator validator = new UserValidator(userService);
             validator.validate(user, request);
             userService.create(user);
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+            session.setAttribute("userRole", user.getRole());
+            session.setAttribute("url", PROFILE);
+            return request.getContextPath() + SIGN_UP;
         } catch (DaoException | IncorrectFormatException e) {
             request.getSession().setAttribute("errorMessage", e.getMessage());
             request.getSession().setAttribute("url", SHOW_SIGNUP_PAGE);
             LOGGER.error(e.getMessage());
             return request.getContextPath() + SIGN_UP;
         }
-        HttpSession session = request.getSession();
-        session.setAttribute("user", user);
-        session.setAttribute("userRole", user.getRole());
-        session.setAttribute("url", PROFILE);
-        return request.getContextPath() + SIGN_UP;
     }
 
     private User getUser(HttpServletRequest request) throws IncorrectFormatException {

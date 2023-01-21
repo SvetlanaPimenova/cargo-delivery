@@ -11,14 +11,18 @@ import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.OrderService;
 import ua.pimenova.model.util.Calculator;
+import ua.pimenova.model.util.validator.ReceiverValidator;
+
 import java.io.IOException;
 import java.util.Date;
+
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
-import static ua.pimenova.model.util.Validator.*;
+
 public class CreateOrderCommand implements ICommand {
     private final OrderService orderService;
     private static final Logger LOGGER = Logger.getLogger(CreateOrderCommand.class);
+
     public CreateOrderCommand(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -35,30 +39,22 @@ public class CreateOrderCommand implements ICommand {
     private String executePost(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         User user = (User) session.getAttribute("user");
-        String path = ERROR;
-        if (user != null) {
-            Freight freight = getFullFreight(request);
-            Receiver receiver = getFullReceiver(request);
-            Order order = getFullOrder(request, freight, receiver, user);
-            try {
-                validateReceiver(receiver);
-                order = orderService.create(order);
-            } catch (DaoException | IncorrectFormatException e) {
-                session.setAttribute("errorMessage", e.getMessage());
-                session.setAttribute("url", ERROR);
-                LOGGER.error(e.getMessage());
-            }
-            path = SHOW_PAGE_CREATE_ORDER;
+        Freight freight = getFullFreight(request);
+        Receiver receiver = getFullReceiver(request);
+        Order order = getFullOrder(request, freight, receiver, user);
+        try {
+            ReceiverValidator validator = new ReceiverValidator();
+            validator.validate(receiver, request);
+            order = orderService.create(order);
             session.setAttribute("newOrder", order);
-            session.setAttribute("url", path);
+            session.setAttribute("url", SHOW_PAGE_CREATE_ORDER);
+            return request.getContextPath() + SHOW_PAGE_CREATE_ORDER;
+        } catch (DaoException | IncorrectFormatException e) {
+            session.setAttribute("errorMessage", e.getMessage());
+            session.setAttribute("url", SHOW_PAGE_CREATE_ORDER);
+            LOGGER.error(e.getMessage());
+            return request.getContextPath() + SHOW_PAGE_CREATE_ORDER;
         }
-        return request.getContextPath() + path;
-    }
-
-    private void validateReceiver(Receiver receiver) throws IncorrectFormatException {
-        validateName(receiver.getFirstname());
-        validateName(receiver.getLastname());
-        validatePhone(receiver.getPhone());
     }
 
     private Freight getFullFreight(HttpServletRequest request) {
@@ -69,13 +65,14 @@ public class CreateOrderCommand implements ICommand {
         double height = Double.parseDouble(request.getParameter("height"));
         String cost = request.getParameter("cost");
         int estimatedCost;
-        if(cost == null || cost.equalsIgnoreCase("")) {
+        if (cost == null || cost.equalsIgnoreCase("")) {
             estimatedCost = 0;
         } else {
             estimatedCost = Integer.parseInt(cost);
         }
         return new Freight(0, weight, length, width, height, estimatedCost, freightType);
     }
+
     private Receiver getFullReceiver(HttpServletRequest request) {
         String firstName = request.getParameter("rfname");
         String lastName = request.getParameter("rlname");
@@ -85,6 +82,7 @@ public class CreateOrderCommand implements ICommand {
         String postalCode = request.getParameter("rpcode");
         return new Receiver(0, firstName, lastName, phone, city, street, postalCode);
     }
+
     private Order getFullOrder(HttpServletRequest request, Freight freight, Receiver receiver, User user) {
         String cityFrom = request.getParameter("cityfrom");
         ExtraOptions.DeliveryType deliveryType = ExtraOptions.DeliveryType.valueOf(request.getParameter("deliverytype").toUpperCase());

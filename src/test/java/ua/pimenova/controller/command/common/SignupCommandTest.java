@@ -12,7 +12,6 @@ import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.UserService;
-import ua.pimenova.model.util.UserValidator;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -24,25 +23,24 @@ import static ua.pimenova.controller.constants.Commands.*;
 class SignupCommandTest {
 
     @Mock
-    HttpServletRequest req;
+    HttpServletRequest request;
     @Mock
-    HttpServletResponse resp;
+    HttpServletResponse response;
     @Mock
     UserService userService;
     @Mock
     HttpSession session;
     @InjectMocks
     SignupCommand command;
-    User user = new User();
-    @Mock
-    UserValidator validator = new UserValidator(userService);
+    User user = new User(1, "Password1", "Ivan", "Ivanov", "+380111111111", "user@gmail.com",
+            0, User.Role.USER, "City", "Street", "Postal Code");
     private AutoCloseable closeable;
 
     @BeforeEach
     public void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
 
-        when(req.getSession()).thenReturn(session);
+        when(request.getSession()).thenReturn(session);
     }
 
     @AfterEach
@@ -52,38 +50,46 @@ class SignupCommandTest {
 
     @Test
     void testExecuteGet() throws ServletException, IOException {
-        setGetRequest(req);
+        setGetRequest(request);
 
-        String path = command.execute(req, resp);
+        String path = command.execute(request, response);
 
         assertEquals(SHOW_SIGNUP_PAGE, path);
-        verify(req).setAttribute(eq("errorMessage"), eq("error"));
+        verify(request).setAttribute(eq("errorMessage"), eq("error"));
         verify(session).removeAttribute(eq("errorMessage"));
         assertEquals(user, session.getAttribute("user"));
     }
 
     @Test
     void testSuccessfulExecutePost() throws IncorrectFormatException, DaoException, ServletException, IOException {
-        setPostRequest(req);
+        setPostRequest(request);
         mockingUser();
-//        when(userService.create(user)).thenReturn(user);
-//        when(session.getAttribute(eq("user"))).thenReturn(user);
-//        when(session.getAttribute(eq("userRole"))).thenReturn(user.getRole());
-//        when(session.getAttribute(eq("url"))).thenReturn(PROFILE);
 
-        doNothing().when(validator).validate(isA(User.class), isA(HttpServletRequest.class));
-        when(userService.create(user)).thenReturn(user);
-        when(req.getContextPath()).thenReturn("/delivery/");
+        when(session.getAttribute("locale")).thenReturn(new Locale("en"));
 
-        String path = command.execute(req, resp);
+        doReturn(user).when(userService).create(user);
+        when(request.getContextPath()).thenReturn("/delivery/");
 
-//        assertEquals(session.getAttribute("user"), user);
-//        assertEquals(session.getAttribute("userRole"), user.getRole());
-//        assertEquals(session.getAttribute("url"), PROFILE);
-        verify(session).setAttribute(eq("user"), eq(user));
-        verify(session).setAttribute(eq("userRole"), eq(user.getRole()));
-        verify(session).setAttribute(eq("url"), eq(PROFILE));
-        assertEquals(req.getContextPath() + SIGN_UP, path);
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("userRole", user.getRole());
+        verify(session).setAttribute("url", PROFILE);
+        assertEquals(request.getContextPath() + SIGN_UP, path);
+    }
+
+    @Test
+    void testBadExecutePost() throws IncorrectFormatException, DaoException, ServletException, IOException {
+        setPostRequest(request);
+        mockingUser();
+        when(request.getParameter("reppass")).thenReturn("Password2");
+        when(session.getAttribute("locale")).thenReturn(new Locale("en")).thenReturn(new Locale("en"));
+        when(request.getContextPath()).thenReturn("/delivery/");
+
+        String path = command.execute(request, response);
+
+        verify(session).setAttribute("errorMessage", "Error: Fields 'Password' and 'Repeat password' must match");
+        verify(session).setAttribute("url", SHOW_SIGNUP_PAGE);
+        assertEquals(request.getContextPath() + SIGN_UP, path);
     }
 
     private void setPostRequest(HttpServletRequest request) {
@@ -98,14 +104,14 @@ class SignupCommandTest {
     }
 
     private void mockingUser() {
-        when(req.getParameter("firstname")).thenReturn("Ivan");
-        when(req.getParameter("lastname")).thenReturn("Ivanov");
-        when(req.getParameter("email")).thenReturn("user@gmail.com");
-        when(req.getParameter("phone")).thenReturn("+380111111111");
-        when(req.getParameter("city")).thenReturn("City");
-        when(req.getParameter("street")).thenReturn("Street");
-        when(req.getParameter("postalcode")).thenReturn("Postal Code");
-        when(req.getParameter("password")).thenReturn("Password1");
-        when(req.getParameter("reppass")).thenReturn("Password1");
+        when(request.getParameter("firstname")).thenReturn("Ivan");
+        when(request.getParameter("lastname")).thenReturn("Ivanov");
+        when(request.getParameter("email")).thenReturn("user@gmail.com");
+        when(request.getParameter("phone")).thenReturn("+380111111111");
+        when(request.getParameter("city")).thenReturn("City");
+        when(request.getParameter("street")).thenReturn("Street");
+        when(request.getParameter("postalcode")).thenReturn("Postal Code");
+        when(request.getParameter("password")).thenReturn("Password1");
+        when(request.getParameter("reppass")).thenReturn("Password1");
     }
 }

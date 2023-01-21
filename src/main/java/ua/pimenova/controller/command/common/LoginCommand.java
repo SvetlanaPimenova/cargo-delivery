@@ -44,7 +44,7 @@ public class LoginCommand implements ICommand {
         try {
             user = userService.getUserByEmailAndPassword(login, password);
             if (user != null) {
-                HttpSession session = request.getSession(false);
+                HttpSession session = request.getSession();
                 session.setAttribute("user", user);
                 session.setAttribute("userRole", user.getRole());
                 path = PROFILE;
