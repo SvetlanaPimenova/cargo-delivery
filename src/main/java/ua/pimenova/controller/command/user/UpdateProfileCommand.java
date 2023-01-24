@@ -32,7 +32,7 @@ public class UpdateProfileCommand implements ICommand {
 
     private String executeGet(HttpServletRequest request) {
         getAttributeFromSessionToRequest(request, "message");
-        return getURL(request);
+        return getUrlAttribute(request);
     }
 
     private String executePost(HttpServletRequest request) {
@@ -46,18 +46,21 @@ public class UpdateProfileCommand implements ICommand {
                 } catch (DaoException e) {
                     LOGGER.error(e.getMessage());
                 }
+                break;
             case "contactData":
                 try {
                     updateContactData(request, user);
                 } catch (DaoException e) {
                     LOGGER.error(e.getMessage());
                 }
+                break;
             case "passwordData":
                 try {
                     updatePasswordData(request, user);
                 } catch (DaoException e) {
                     LOGGER.error(e.getMessage());
                 }
+                break;
         }
         session.setAttribute("url", PROFILE);
         return request.getContextPath() + UPDATE_PROFILE;

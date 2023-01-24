@@ -9,7 +9,7 @@ import ua.pimenova.model.service.UserService;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static ua.pimenova.model.util.validator.Regex.*;
+import static ua.pimenova.model.util.constants.Regex.*;
 
 public class UserValidator implements Validator<User> {
 

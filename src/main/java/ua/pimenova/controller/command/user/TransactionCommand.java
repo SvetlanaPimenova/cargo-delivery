@@ -37,7 +37,7 @@ public class TransactionCommand implements ICommand {
         getAttributeFromSessionToRequest(request,"order_id");
         getAttributeFromSessionToRequest(request, "isUpdated");
         getAttributeFromSessionToRequest(request, "errorMessage");
-        return getURL(request) + formParameters(request);
+        return getUrlAttribute(request) + formParameters(request);
     }
 
     private String formParameters(HttpServletRequest request) {

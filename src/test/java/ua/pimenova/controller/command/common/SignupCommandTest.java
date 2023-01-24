@@ -12,6 +12,7 @@ import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.UserService;
+import ua.pimenova.model.util.EmailSender;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -67,6 +68,10 @@ class SignupCommandTest {
 
         when(session.getAttribute("locale")).thenReturn(new Locale("en"));
 
+        EmailSender emailSender = mock(EmailSender.class);
+
+        doNothing().when(emailSender).send(isA(String.class), isA(String.class), isA(String.class));
+
         doReturn(user).when(userService).create(user);
         when(request.getContextPath()).thenReturn("/delivery/");
 
@@ -94,6 +99,8 @@ class SignupCommandTest {
 
     private void setPostRequest(HttpServletRequest request) {
         when(request.getMethod()).thenReturn("post");
+        when(request.getServletPath()).thenReturn("/createOrder");
+        doReturn(new StringBuffer("http://localhost:8080/delivery/createOrder")).when(request).getRequestURL();
     }
 
     private void setGetRequest(HttpServletRequest request) {

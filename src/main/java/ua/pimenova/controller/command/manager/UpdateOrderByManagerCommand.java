@@ -29,7 +29,7 @@ public class UpdateOrderByManagerCommand implements ICommand {
 
     private String executeGet(HttpServletRequest request) {
         getAttributeFromSessionToRequest(request, "errorMessage");
-        return getURL(request);
+        return getUrlAttribute(request);
     }
 
     private String executePost(HttpServletRequest request) {

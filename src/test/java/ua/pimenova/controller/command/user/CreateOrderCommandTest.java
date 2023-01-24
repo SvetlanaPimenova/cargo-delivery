@@ -12,15 +12,18 @@ import ua.pimenova.model.database.entity.*;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.OrderService;
+import ua.pimenova.model.util.EmailSender;
 import ua.pimenova.model.util.validator.ReceiverValidator;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static ua.pimenova.controller.constants.Commands.SHOW_PAGE_CREATE_ORDER;
+import static ua.pimenova.controller.constants.Commands.*;
 
 class CreateOrderCommandTest {
     @Mock
@@ -62,12 +65,15 @@ class CreateOrderCommandTest {
     }
 
     @Test
-    public void createOrderTest() throws DaoException, ServletException, IOException, IncorrectFormatException {
+    public void createOrderTest() throws DaoException, ServletException, IOException {
         setPostRequest(request);
         mockingFreight();
         mockingReceiver();
         when(request.getParameter("cityfrom")).thenReturn("City");
         when(request.getParameter("deliverytype")).thenReturn("TO_THE_BRANCH");
+        EmailSender emailSender = mock(EmailSender.class);
+
+        doNothing().when(emailSender).send(isA(String.class), isA(String.class), isA(String.class));
 
         when(session.getAttribute("locale")).thenReturn(new Locale("en"));
         doReturn(testOrder).when(orderService).create(isA(Order.class));
@@ -76,11 +82,11 @@ class CreateOrderCommandTest {
 
         verify(session).setAttribute("newOrder", testOrder);
         verify(session).setAttribute("url", SHOW_PAGE_CREATE_ORDER);
-        assertEquals(request.getContextPath() + SHOW_PAGE_CREATE_ORDER, path);
+        assertEquals(request.getContextPath() + CREATE_ORDER, path);
     }
 
     @Test
-    void testIncorrectReceiver() throws IncorrectFormatException, DaoException, ServletException, IOException {
+    void testIncorrectReceiver() throws ServletException, IOException {
         setPostRequest(request);
         mockingFreight();
         mockingReceiver();
@@ -93,7 +99,7 @@ class CreateOrderCommandTest {
 
         verify(session).setAttribute("errorMessage", "Error: Name does not match");
         verify(session).setAttribute("url", SHOW_PAGE_CREATE_ORDER);
-        assertEquals(request.getContextPath() + SHOW_PAGE_CREATE_ORDER, path);
+        assertEquals(request.getContextPath() + CREATE_ORDER, path);
 
     }
 
@@ -103,20 +109,25 @@ class CreateOrderCommandTest {
 
         String path = command.execute(request, response);
 
+        verify(request).setAttribute(eq("errorMessage"), eq("error"));
+        verify(session).removeAttribute(eq("errorMessage"));
         assertEquals(SHOW_PAGE_CREATE_ORDER, path);
     }
 
-    private void setPostRequest(HttpServletRequest request) {
+    private void setPostRequest(HttpServletRequest request) throws MalformedURLException {
         when(request.getMethod()).thenReturn("post");
         when(request.getSession(false)).thenReturn(session);
         when(request.getContextPath()).thenReturn("delivery");
         when(session.getAttribute("user")).thenReturn(sender);
+        when(request.getServletPath()).thenReturn("/createOrder");
+        doReturn(new StringBuffer("http://localhost:8080/delivery/createOrder")).when(request).getRequestURL();
     }
 
     private void setGetRequest(HttpServletRequest request) {
         when(request.getMethod()).thenReturn("get");
         when(request.getSession()).thenReturn(session);
         when(session.getAttribute("url")).thenReturn(SHOW_PAGE_CREATE_ORDER);
+        when(session.getAttribute("errorMessage")).thenReturn("error");
     }
 
     private void mockingFreight() {

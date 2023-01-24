@@ -11,6 +11,7 @@ import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.OrderService;
 import ua.pimenova.model.util.Calculator;
+import ua.pimenova.model.util.EmailSender;
 import ua.pimenova.model.util.validator.ReceiverValidator;
 
 import java.io.IOException;
@@ -18,10 +19,12 @@ import java.util.Date;
 
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
+import static ua.pimenova.model.util.constants.Email.*;
 
 public class CreateOrderCommand implements ICommand {
     private final OrderService orderService;
     private static final Logger LOGGER = Logger.getLogger(CreateOrderCommand.class);
+    private final EmailSender emailSender = new EmailSender();
 
     public CreateOrderCommand(OrderService orderService) {
         this.orderService = orderService;
@@ -33,7 +36,13 @@ public class CreateOrderCommand implements ICommand {
     }
 
     private String executeGet(HttpServletRequest request) {
-        return getURL(request);
+        getAttributeFromSessionToRequest(request, "errorMessage");
+        Order orderAttribute = (Order) request.getSession().getAttribute("newOrder");
+        if (orderAttribute != null) {
+            request.setAttribute("newOrder", orderAttribute);
+            request.getSession().removeAttribute("newOrder");
+        }
+        return getUrlAttribute(request);
     }
 
     private String executePost(HttpServletRequest request) {
@@ -48,13 +57,19 @@ public class CreateOrderCommand implements ICommand {
             order = orderService.create(order);
             session.setAttribute("newOrder", order);
             session.setAttribute("url", SHOW_PAGE_CREATE_ORDER);
-            return request.getContextPath() + SHOW_PAGE_CREATE_ORDER;
+            sendEmail(user, order, getURL(request));
+            return request.getContextPath() + CREATE_ORDER;
         } catch (DaoException | IncorrectFormatException e) {
             session.setAttribute("errorMessage", e.getMessage());
             session.setAttribute("url", SHOW_PAGE_CREATE_ORDER);
             LOGGER.error(e.getMessage());
-            return request.getContextPath() + SHOW_PAGE_CREATE_ORDER;
+            return request.getContextPath() + CREATE_ORDER;
         }
+    }
+
+    private void sendEmail(User user, Order order, String url) {
+        String body = String.format(MESSAGE_CREATE_ORDER, user.getFirstname(), order.getTotalCost(), url);
+        new Thread(() -> emailSender.send(SUBJECT_NOTIFICATION, body, user.getEmail())).start();
     }
 
     private Freight getFullFreight(HttpServletRequest request) {

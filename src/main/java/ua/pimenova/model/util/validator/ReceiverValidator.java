@@ -5,8 +5,8 @@ import ua.pimenova.model.database.entity.Receiver;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 
-import static ua.pimenova.model.util.validator.Regex.NAME_REGEX;
-import static ua.pimenova.model.util.validator.Regex.PHONE_REGEX;
+import static ua.pimenova.model.util.constants.Regex.NAME_REGEX;
+import static ua.pimenova.model.util.constants.Regex.PHONE_REGEX;
 
 public class ReceiverValidator implements Validator<Receiver> {
 

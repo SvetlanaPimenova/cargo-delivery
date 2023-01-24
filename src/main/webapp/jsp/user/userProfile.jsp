@@ -161,7 +161,7 @@ body, html {
             </c:when>
             <c:otherwise>
                 <div class="w3-center">
-                    <h3>${requestScope.message}</h3>
+                    <h3>${message}</h3>
                 </div>
             </c:otherwise>
         </c:choose>
@@ -186,12 +186,16 @@ body, html {
                                    id="email">
                         </div>
                     </div>
+                    <br>
+                    <div class="w3-row-padding">
                     <label for="city"><fmt:message key="label.city"/>:</label><br>
-                    <input class="w3-input w3-border" type="text" value="${sessionScope.user.city}" name="city" id="city"><br>
-                    <label for="street"><fmt:message key="label.street"/>:</label><br>
-                    <input class="w3-input w3-border" type="text" value="${sessionScope.user.street}" name="street" id="street"><br>
-                    <label for="postalcode"><fmt:message key="label.postalcode"/>:</label><br>
-                    <input class="w3-input w3-border" type="text" value="${sessionScope.user.postalCode}" name="postalcode" id="postalcode"><br>
+                                                                    <input class="w3-input w3-border" type="text" value="${sessionScope.user.city}" name="city" id="city"><br>
+                                                                    <label for="street"><fmt:message key="label.street"/>:</label><br>
+                                                                    <input class="w3-input w3-border" type="text" value="${sessionScope.user.street}" name="street" id="street"><br>
+                                                                    <label for="postalcode"><fmt:message key="label.postalcode"/>:</label><br>
+                                                                    <input class="w3-input w3-border" type="text" value="${sessionScope.user.postalCode}" name="postalcode" id="postalcode"><br>
+
+                    </div>
                     <div class="w3-row-padding w3-center">
                         <button class="w3-button" type="submit"><fmt:message key="button.submit"/></button>
                         <button class="w3-button" type="reset"><fmt:message key="calculator.button.reset"/></button>
@@ -200,7 +204,7 @@ body, html {
             </c:when>
             <c:otherwise>
                 <div class="w3-center">
-                    <h3>${requestScope.message}</h3>
+                    <h3>${message}</h3>
                 </div>
             </c:otherwise>
         </c:choose>
@@ -237,7 +241,7 @@ body, html {
             </c:when>
             <c:otherwise>
                 <div class="w3-center">
-                    <h3>${requestScope.message}</h3>
+                    <h3>${message}</h3>
                 </div>
             </c:otherwise>
         </c:choose>

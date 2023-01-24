@@ -18,7 +18,13 @@ public class CommandUtil {
         }
     }
 
-    public static String getURL(HttpServletRequest request) {
+    public static String getUrlAttribute(HttpServletRequest request) {
         return (String) request.getSession().getAttribute("url");
+    }
+
+    public static String getURL(HttpServletRequest request) {
+        String servletPath = request.getServletPath();
+        String requestURL = request.getRequestURL().toString();
+        return requestURL.replace(servletPath, "");
     }
 }

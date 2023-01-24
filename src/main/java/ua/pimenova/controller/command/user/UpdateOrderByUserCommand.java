@@ -39,7 +39,7 @@ public class UpdateOrderByUserCommand implements ICommand {
     private String executeGet(HttpServletRequest request) {
         getAttributeFromSessionToRequest(request,"order_id");
         getAttributeFromSessionToRequest(request, "isUpdated");
-        return getURL(request) + formParameters(request);
+        return getUrlAttribute(request) + formParameters(request);
     }
 
     private String formParameters(HttpServletRequest request) {

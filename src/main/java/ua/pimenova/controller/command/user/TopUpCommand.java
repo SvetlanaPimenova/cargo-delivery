@@ -26,7 +26,7 @@ public class TopUpCommand implements ICommand {
     }
 
     private String executeGet(HttpServletRequest request) {
-        return getURL(request);
+        return getUrlAttribute(request);
     }
 
     private String executePost(HttpServletRequest request) {

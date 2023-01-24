@@ -10,15 +10,19 @@ import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.exception.IncorrectFormatException;
 import ua.pimenova.model.service.UserService;
+import ua.pimenova.model.util.EmailSender;
 import ua.pimenova.model.util.validator.UserValidator;
 
 import java.io.IOException;
 
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
+import static ua.pimenova.model.util.constants.Email.*;
 
 public class SignupCommand implements ICommand {
     private final UserService userService;
+
+    private final EmailSender emailSender = new EmailSender();
 
     public SignupCommand(UserService userService) {
         this.userService = userService;
@@ -33,7 +37,7 @@ public class SignupCommand implements ICommand {
 
     private String executeGet(HttpServletRequest request) {
         getAttributeFromSessionToRequest(request, "errorMessage");
-        return getURL(request);
+        return getUrlAttribute(request);
     }
 
     private String executePost(HttpServletRequest request) {
@@ -46,6 +50,7 @@ public class SignupCommand implements ICommand {
             session.setAttribute("user", user);
             session.setAttribute("userRole", user.getRole());
             session.setAttribute("url", PROFILE);
+            sendEmail(user, getURL(request));
             return request.getContextPath() + SIGN_UP;
         } catch (DaoException | IncorrectFormatException e) {
             request.getSession().setAttribute("errorMessage", e.getMessage());
@@ -53,6 +58,11 @@ public class SignupCommand implements ICommand {
             LOGGER.error(e.getMessage());
             return request.getContextPath() + SIGN_UP;
         }
+    }
+
+    private void sendEmail(User user, String url) {
+        String body = String.format(MESSAGE_GREETINGS, user.getFirstname(), url);
+        new Thread(() -> emailSender.send(SUBJECT_GREETINGS, body, user.getEmail())).start();
     }
 
     private User getUser(HttpServletRequest request) throws IncorrectFormatException {

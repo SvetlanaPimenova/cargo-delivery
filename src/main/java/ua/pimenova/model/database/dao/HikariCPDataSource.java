@@ -2,6 +2,8 @@ package ua.pimenova.model.database.dao;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.log4j.Logger;
+import ua.pimenova.model.database.dao.impl.FreightDaoImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +22,7 @@ public class HikariCPDataSource {
 
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource ds;
+    private static final Logger LOGGER = Logger.getLogger(HikariCPDataSource.class);
 
     static {
         Properties properties = getProperties();
@@ -40,7 +43,7 @@ public class HikariCPDataSource {
                 .getResourceAsStream(connectionFile)) {
             properties.load(resource);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return properties;
     }

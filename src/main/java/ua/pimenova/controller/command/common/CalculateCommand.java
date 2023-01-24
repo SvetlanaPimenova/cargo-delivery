@@ -18,7 +18,7 @@ public class CalculateCommand implements ICommand {
     private String executeGet(HttpServletRequest request) {
         getAttributeFromSession(request);
         getAttributeFromSessionToRequest(request, "result");
-        return getURL(request);
+        return getUrlAttribute(request);
     }
 
     private void getAttributeFromSession(HttpServletRequest request) {
