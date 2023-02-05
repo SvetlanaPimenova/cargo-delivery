@@ -11,6 +11,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Class to configure and obtain HikariDataSource. Use it to connect to database
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class HikariCPDataSource {
     private static final String URL_PROPERTY = "jdbcUrl";
     private static final String USER_NAME = "username";
@@ -50,6 +56,11 @@ public class HikariCPDataSource {
 
     private HikariCPDataSource() {}
 
+    /**
+     * Class to obtain Connection
+     * @return - Connection from pool
+     * @throws SQLException - unhandled exception
+     */
     public static Connection getConnection() throws SQLException {
         return ds.getConnection();
     }

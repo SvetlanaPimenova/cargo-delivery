@@ -15,13 +15,30 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * ShowUpdateShipmentCommand class. Accessible by manager
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class ShowUpdateShipmentCommand implements ICommand {
     private final OrderService orderService;
     private static final Logger logger = LoggerFactory.getLogger(ShowUpdateShipmentCommand.class);
+
+    /**
+     * @param orderService - OrderService implementation to use in command
+     */
     public ShowUpdateShipmentCommand(OrderService orderService) {
         this.orderService = orderService;
     }
 
+    /**
+     * Checks if order's execution status isn't equals "IN PROCESSING". Depends on success or not it returns ether update order page
+     * or error page with  message.
+     * @param request - to get order id and locale
+     * @param response - passed by application
+     * @return update order page or error page
+     */
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("shipment_id"));

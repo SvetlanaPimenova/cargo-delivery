@@ -19,27 +19,57 @@ import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 import static ua.pimenova.model.util.constants.Email.*;
 
+/**
+ * SignupCommand class. Accessible by any user. Allows to create an account. Implements PRG pattern
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class SignupCommand implements ICommand {
     private final UserService userService;
 
     private final EmailSender emailSender = new EmailSender();
 
+    /**
+     * @param userService - UserService implementation to use in command
+     */
     public SignupCommand(UserService userService) {
         this.userService = userService;
     }
 
     private static final Logger LOGGER = Logger.getLogger(SignupCommand.class);
 
+    /**
+     * Checks method and calls required implementation
+     *
+     * @param request - to get method, session and set all required attributes
+     * @param response - passed by application
+     * @return path to redirect or forward by front-controller
+     */
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         return isMethodPost(request) ? executePost(request) : executeGet(request);
     }
 
+    /**
+     * Called from doGet method in front-controller. Obtains required path and transfer attributes from session
+     * to request
+     *
+     * @param request to get error message attribute from session and put it in request.
+     * @return either profile page if everything is fine or sign-up if not
+     */
     private String executeGet(HttpServletRequest request) {
         getAttributeFromSessionToRequest(request, "errorMessage");
         return getUrlAttribute(request);
     }
 
+    /**
+     * Called from doPost method in front-controller. Tries to register user. Sets different path to session depends on
+     * success or not. Sends email if registration was successful
+     *
+     * @param request to get users fields from parameters
+     * @return path to redirect to executeGet method
+     */
     private String executePost(HttpServletRequest request) {
         try {
             User user = getUser(request);

@@ -6,6 +6,12 @@ import ua.pimenova.model.database.entity.Freight;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Calculate order's total cost
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class Calculator {
 
     private static final Map<Double, Integer> rates = new HashMap<>();
@@ -23,6 +29,15 @@ public class Calculator {
 
     private Calculator() {}
 
+    /**
+     * Calculates total cost depending on the input parameters
+     * @param citiFrom - string value of field "from"
+     * @param cityTo - string value of field "to"
+     * @param freightType - string value of field "freight type"
+     * @param deliveryType - string value of field "delivery type"
+     * @param weight - string value of field "weight"
+     * @return Order's total cost
+     */
     public static int getTotalCost(String citiFrom, String cityTo, Freight.FreightType freightType,
                                    ExtraOptions.DeliveryType deliveryType, double weight) {
         ExtraOptions.Direction direction;

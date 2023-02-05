@@ -1,8 +1,16 @@
 package ua.pimenova.model.util.constants;
 
+/**
+ * Contains letter's subjects and bodies
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class Email {
+    /** For new users only */
     public static final String SUBJECT_GREETINGS = "Welcome to Cargo Delivery Application!";
 
+    /** Any notification letter subject */
     public static final String SUBJECT_NOTIFICATION = "Cargo Delivery notification!";
 
     // Place user's name instead of %s
@@ -33,6 +41,23 @@ public class Email {
             "You can also check more detailed information about the cargo " +
             A_HREF + "%s" + "/orders>here</a>." + DOUBLE_ENTER + SIGNATURE;
 
+    public static final String MESSAGE_TOP_UP_ACCOUNT = HELLO + INFORMATION +
+            DOUBLE_ENTER +
+            "<h4>You have replenished your account in the amount of %s UAH.</h4><br>" +
+            "Current account: %s, UAH.<br>" +
+            DOUBLE_ENTER +
+            "You can also check more detailed information about it at your " +
+            A_HREF + "%s" + "/profile>profile</a>." + DOUBLE_ENTER + SIGNATURE;
+
+    public static final String MESSAGE_CHANGE_ORDER_STATUS = HELLO + INFORMATION +
+            DOUBLE_ENTER +
+            "<h4>Your order statuses have changed.</h4><br>" +
+            "Payment status: %s.<br>" +
+            "Execution status: %s.<br>" +
+            DOUBLE_ENTER +
+            "Navigate through " + A_HREF + "%s" + "/orders>orders</a>, " +
+            "check detailed information, payment and execution statuses." +
+            DOUBLE_ENTER + SIGNATURE;
 
 
     private Email() {}

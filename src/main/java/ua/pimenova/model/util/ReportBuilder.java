@@ -26,14 +26,29 @@ import java.util.stream.Stream;
 
 import static com.itextpdf.kernel.colors.ColorConstants.LIGHT_GRAY;
 
+/**
+ * Create required pdf document with itext library
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class ReportBuilder {
     private static final org.apache.log4j.Logger LOGGER = Logger.getLogger(ReportBuilder.class);
     private final Locale locale;
 
+    /**
+     * @param locale - to properly define language
+     */
     public ReportBuilder(Locale locale) {
         this.locale = locale;
     }
 
+    /**
+     * Creates pdf bill with Shipment's info. Creates resourceBundle to localize table fields
+     *
+     * @param response - to open file in a new browser tab
+     * @param order - order, information about which must be placed in the document
+     */
     public void billPdf(HttpServletResponse response, Order order) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("messages", locale);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -134,6 +149,13 @@ public class ReportBuilder {
                 .setTextAlignment(TextAlignment.RIGHT);
     }
 
+    /**
+     * Creates pdf report with Order's info. Creates resourceBundle to localize table fields
+     *
+     * @param response - to open file in a new browser tab
+     * @param list - list of orders to be placed in the document
+     * @param parameter - parameter by which the report is generated. Is used in header
+     */
     public void reportPdf(HttpServletResponse response, List<Order> list, String parameter) {
         ResourceBundle resourceBundle = ResourceBundle.getBundle("messages", locale);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

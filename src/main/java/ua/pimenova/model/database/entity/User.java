@@ -1,5 +1,11 @@
 package ua.pimenova.model.database.entity;
 
+/**
+ * User entity class. Matches table 'users' in database.
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class User {
     private int id;
     private String password;
@@ -130,17 +136,20 @@ public class User {
                 postalCode;
     }
 
-    public static class UserFields {
-        public static final String ID = "id";
-        public static final String PASSWORD = "password";
-        public static final String FIRSTNAME = "firstname";
-        public static final String LASTNAME = "lastname";
-        public static final String PHONE = "phone";
-        public static final String EMAIL = "e-mail";
-        public static final String ACCOUNT = "account";
-        public static final String ROLE = "role";
-        public static final String CITY = "city";
-        public static final String STREET = "street";
-        public static final String POSTAL_CODE = "postal_code";
-    }
+//    /**
+//     * Class that contains SQL database fields for the table 'users'
+//     */
+//    public static class UserFields {
+//        public static final String ID = "id";
+//        public static final String PASSWORD = "password";
+//        public static final String FIRSTNAME = "firstname";
+//        public static final String LASTNAME = "lastname";
+//        public static final String PHONE = "phone";
+//        public static final String EMAIL = "e-mail";
+//        public static final String ACCOUNT = "account";
+//        public static final String ROLE = "role";
+//        public static final String CITY = "city";
+//        public static final String STREET = "street";
+//        public static final String POSTAL_CODE = "postal_code";
+//    }
 }

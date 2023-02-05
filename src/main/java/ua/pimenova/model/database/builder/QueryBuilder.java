@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
+/**
+ * Defines all methods to build query to obtain sorted, ordered and limited list of entities
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class QueryBuilder {
     private final List<String> filters = new ArrayList<>();
     private String sortParameter;
@@ -16,10 +22,21 @@ public class QueryBuilder {
 
     public QueryBuilder() {}
 
+    /**
+     * Creates concrete filter for query
+     * @param userId - user id for query
+     * @return QueryBuilder (as Builder pattern)
+     */
     public QueryBuilder setUserIdFilter(int userId) {
         filters.add("sender_info = " + userId);
         return this;
     }
+
+    /**
+     * Creates delivery type filter for query
+     * @param deliveryFilter - can be 'to the branch' or 'courier'
+     * @return QueryBuilder (as Builder pattern)
+     */
     public QueryBuilder setDeliveryFilter(String deliveryFilter) {
         if (deliveryFilter != null && deliveryFilter.equals("to_the_branch")) {
             filters.add("delivery_type_id=" + ExtraOptions.DeliveryType.TO_THE_BRANCH.getId());
@@ -28,6 +45,12 @@ public class QueryBuilder {
         }
         return this;
     }
+
+    /**
+     * Creates freight type filter for query
+     * @param freightFilter - can be goods/glass/compact
+     * @return QueryBuilder (as Builder pattern)
+     */
     public QueryBuilder setFreightTypeFilter(String freightFilter) {
         if (freightFilter != null && !freightFilter.equals("")) {
             filters.add("`name` = \"" + freightFilter + "\"" );
@@ -35,6 +58,11 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Creates payment status filter for query
+     * @param paymentFilter can be either 'paid' or 'unpaid'
+     * @return QueryBuilder (as Builder pattern)
+     */
     public QueryBuilder setPaymentFilter(String paymentFilter) {
         if(paymentFilter != null && !paymentFilter.equals("")) {
             filters.add("payment_status = \"" + paymentFilter.toUpperCase() + "\"");
@@ -42,6 +70,11 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Creates execution status filter for query
+     * @param executionFilter - can be 'in processing'/'formed'/'sent'/'arrived at destination'/'delivered'
+     * @return QueryBuilder (as Builder pattern)
+     */
     public QueryBuilder setExecutionFilter(String executionFilter) {
         if(executionFilter != null && !executionFilter.equals("")) {
             filters.add("execution_status = \"" + executionFilter.toUpperCase() + "\"");
@@ -49,19 +82,30 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Sets sort and order parameters
+     * @param sortParameter - is split to define sort parameter and sorting order
+     * @return QueryBuilder (as Builder pattern)
+     */
     public QueryBuilder setSortParameter(String sortParameter) {
         if (sortParameter != null && !sortParameter.equals("") ) {
-            String[] splited = sortParameter.split("_");
-            if(splited[0].equalsIgnoreCase("cost")) {
+            String[] split = sortParameter.split("_");
+            if(split[0].equalsIgnoreCase("cost")) {
                 this.sortParameter = "total_cost";
-            } else if(splited[0].equalsIgnoreCase("date")) {
+            } else if(split[0].equalsIgnoreCase("date")) {
                 this.sortParameter = "date";
             }
-            this.order = splited[1].toUpperCase();
+            this.order = split[1].toUpperCase();
         }
         return this;
     }
 
+    /**
+     * Sets limits for pagination
+     * @param page - current page to calculate offset
+     * @param records - number of records per page. Checks if valid, sets by default if not
+     * @return
+     */
     public QueryBuilder setLimits(String page, String records) {
         if (page != null && isPositiveInt(page)) {
             currentPage = Integer.parseInt(page);
@@ -85,10 +129,16 @@ public class QueryBuilder {
         return true;
     }
 
+    /**
+     * @return complete query to use in DAO to obtain list of entities
+     */
     public String getQuery() {
         return getFilterQuery() + getSortQuery() + getLimitQuery();
     }
 
+    /**
+     * @return filter query to use in DAO to obtain number of records
+     */
     public String getRecordQuery() {
         return getFilterQuery();
     }

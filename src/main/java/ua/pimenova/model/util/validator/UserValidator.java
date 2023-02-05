@@ -11,14 +11,31 @@ import java.util.ResourceBundle;
 
 import static ua.pimenova.model.util.constants.Regex.*;
 
+/**
+ * UserValidator class. Validate user
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class UserValidator implements Validator<User> {
 
 
     private final UserService userService;
 
+    /**
+     * @param userService - to check if email and phone are unique
+     */
     public UserValidator(UserService userService) {
         this.userService = userService;
     }
+
+    /**
+     * Checks entity fields for matching regexes
+     * @param user - User being validated
+     * @param request - passed by controller
+     * @throws IncorrectFormatException - an unhandled exception. Will cause front-controller to redirect to error page
+     * @throws DaoException - an unhandled exception. Will cause front-controller to redirect to error page
+     */
     @Override
     public void validate(User user, HttpServletRequest request) throws IncorrectFormatException, DaoException {
         validateName(user.getFirstname());

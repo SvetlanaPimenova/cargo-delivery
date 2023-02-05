@@ -1,6 +1,5 @@
 package ua.pimenova.controller.command.manager;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -14,7 +13,6 @@ import ua.pimenova.model.service.ReceiverService;
 import ua.pimenova.model.service.UserService;
 import ua.pimenova.model.util.ReportBuilder;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,20 +20,37 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * PdfBuilderCommand class. Accessible by manager. Allows to download a list of all orders/users due to the searching parameter
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class PdfBuilderCommand implements ICommand {
     private final OrderService orderService;
     private final UserService userService;
     private final ReceiverService receiverService;
     private static final Logger LOGGER = Logger.getLogger(PdfBuilderCommand.class);
 
+    /**
+     * @param orderService - OrderService implementation to use in command
+     * @param userService - UserService implementation to use in command
+     * @param receiverService - ReceiverService implementation to use in command
+     */
     public PdfBuilderCommand(OrderService orderService, UserService userService, ReceiverService receiverService) {
         this.orderService = orderService;
         this.userService = userService;
         this.receiverService = receiverService;
     }
 
+    /**
+     * Obtains a list of all orders/users due to the searching parameter, transfer locale and response to build a pdf report
+     *
+     * @param request to get searching parameter and locale
+     * @param response to transfer it to the report builder
+     */
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
         String searchParameter = request.getParameter("searchParameter");
         String parameter = request.getParameter("parameter");
         List<Order> list = new ArrayList<>();

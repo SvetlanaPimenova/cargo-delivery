@@ -6,9 +6,18 @@ import jakarta.servlet.jsp.tagext.SimpleTagSupport;
 
 import java.io.IOException;
 
+/**
+ * GreetingsTag class
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class GreetingsTag extends SimpleTagSupport {
     private String name;
 
+    /**
+     *  Writes to JspWriter user's name
+     */
     @Override
     public void doTag() throws JspException, IOException {
         if(name != null) {
@@ -17,6 +26,9 @@ public class GreetingsTag extends SimpleTagSupport {
         }
     }
 
+    /**
+     *  Sets user's name.
+     */
     public void setName(String userName) {
         this.name = userName;
     }

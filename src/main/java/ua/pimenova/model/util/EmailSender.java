@@ -10,6 +10,12 @@ import javax.mail.internet.MimeMultipart;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Send emails to Users
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class EmailSender {
     private static final Logger LOGGER = Logger.getLogger(EmailSender.class);
     private final String user;
@@ -21,6 +27,12 @@ public class EmailSender {
         session = getSession(user, properties);
     }
 
+    /**
+     * Sends email to User.Email contains html tags and text.
+     * @param subject - email's greetings
+     * @param body - email's letter
+     * @param sendTo - email's recipient
+     */
     public void send(String subject, String body, String sendTo) {
         MimeMessage message = new MimeMessage(session);
         try {

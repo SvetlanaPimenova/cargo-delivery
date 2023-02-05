@@ -14,6 +14,7 @@ import ua.pimenova.model.database.entity.*;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
 import ua.pimenova.model.service.UserService;
+import ua.pimenova.model.util.EmailSender;
 
 import java.io.IOException;
 import java.util.Date;
@@ -89,6 +90,10 @@ class TransactionCommandTest {
         when(userService.update(sender)).thenReturn(true);
         when(orderService.update(testOrder)).thenReturn(true);
 
+        EmailSender emailSender = mock(EmailSender.class);
+
+        doNothing().when(emailSender).send(isA(String.class), isA(String.class), isA(String.class));
+
         String path = command.execute(request, response);
 
         verify(session).setAttribute("isUpdated", "true");
@@ -119,6 +124,8 @@ class TransactionCommandTest {
         when(request.getSession(false)).thenReturn(session);
         when(session.getAttribute("user")).thenReturn(sender);
         when(request.getParameter("order_id")).thenReturn("1");
+        when(request.getServletPath()).thenReturn("/transaction");
+        doReturn(new StringBuffer("http://localhost:8080/delivery/transaction")).when(request).getRequestURL();
     }
 
     private void setGetRequest(HttpServletRequest request) {

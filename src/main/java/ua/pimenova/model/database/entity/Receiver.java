@@ -1,5 +1,11 @@
 package ua.pimenova.model.database.entity;
 
+/**
+ * Receiver entity class. Matches table 'receivers' in database.
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class Receiver {
     private int id;
     private String firstname;
@@ -85,13 +91,16 @@ public class Receiver {
                 + street + ", " + postal_code;
     }
 
-    public static class ReceiverFields {
-        public static final String ID = "id";
-        public static final String FIRSTNAME = "firstname";
-        public static final String LASTNAME = "lastname";
-        public static final String PHONE = "phone";
-        public static final String CITY = "city";
-        public static final String STREET = "street";
-        public static final String POSTAL_CODE = "postal_code";
-    }
+//    /**
+//     * Class that contains SQL database fields for the table 'receivers'
+//     */
+//    public static class ReceiverFields {
+//        public static final String ID = "id";
+//        public static final String FIRSTNAME = "firstname";
+//        public static final String LASTNAME = "lastname";
+//        public static final String PHONE = "phone";
+//        public static final String CITY = "city";
+//        public static final String STREET = "street";
+//        public static final String POSTAL_CODE = "postal_code";
+//    }
 }

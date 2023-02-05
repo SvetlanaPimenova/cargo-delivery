@@ -1,5 +1,11 @@
 package ua.pimenova.model.database.entity;
 
+/**
+ * Freight entity class. Matches table 'freights' in database.
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class Freight {
     private int id;
     private double weight;
@@ -113,13 +119,16 @@ public class Freight {
                 "Estimated cost: " + estimatedCost + " UAH";
     }
 
-    public static class FreightFields {
-        public static final String ID = "id";
-        public static final String WEIGHT = "weight";
-        public static final String LENGTH = "length";
-        public static final String WIDTH = "width";
-        public static final String HEIGHT = "height";
-        public static final String ESTIMATED_COST = "estimated_cost";
-        public static final String FREIGHT_TYPE_NAME = "name";
-    }
+//    /**
+//     * Class that contains SQL database fields for the table 'freights'
+//     */
+//    public static class FreightFields {
+//        public static final String ID = "id";
+//        public static final String WEIGHT = "weight";
+//        public static final String LENGTH = "length";
+//        public static final String WIDTH = "width";
+//        public static final String HEIGHT = "height";
+//        public static final String ESTIMATED_COST = "estimated_cost";
+//        public static final String FREIGHT_TYPE_NAME = "name";
+//    }
 }

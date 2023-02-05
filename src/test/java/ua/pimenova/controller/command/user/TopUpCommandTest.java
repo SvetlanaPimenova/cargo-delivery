@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.UserService;
+import ua.pimenova.model.util.EmailSender;
 import ua.pimenova.model.util.EncryptingUserPassword;
 
 import java.io.IOException;
@@ -73,6 +74,10 @@ class TopUpCommandTest {
         when(request.getParameter("account")).thenReturn("100");
         when(userService.update(user)).thenReturn(true);
 
+        EmailSender emailSender = mock(EmailSender.class);
+
+        doNothing().when(emailSender).send(isA(String.class), isA(String.class), isA(String.class));
+
         String path = command.execute(request, response);
 
         assertEquals(100, user.getAccount());
@@ -97,6 +102,8 @@ class TopUpCommandTest {
     private void setPostRequest(HttpServletRequest request) {
         when(request.getMethod()).thenReturn("post");
         when(request.getSession(false)).thenReturn(session);
+        when(request.getServletPath()).thenReturn("/top_up");
+        doReturn(new StringBuffer("http://localhost:8080/delivery/top_up")).when(request).getRequestURL();
     }
 
     private void setGetRequest(HttpServletRequest request) {

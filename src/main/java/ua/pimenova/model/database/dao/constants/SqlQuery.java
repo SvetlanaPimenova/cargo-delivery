@@ -1,6 +1,16 @@
-package ua.pimenova.model.database.dao;
+package ua.pimenova.model.database.dao.constants;
 
+/**
+ * Class that contains all SQL queries
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class SqlQuery {
+
+    /**
+     * Class that contains all SQL queries for the table 'freights'
+     */
     public static class FreightQuery {
         public static final String ADD_FREIGHT = "INSERT INTO freights (id, weight, length, width, height, estimated_cost, freight_type_id) "
                 + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)";
@@ -15,6 +25,9 @@ public class SqlQuery {
         public static final String DELETE_FREIGHT = "DELETE FROM freights WHERE id = ?";
     }
 
+    /**
+     * Class that contains all SQL queries for the table 'users'
+     */
     public static class UsersQuery {
         public static final String ADD_USER = "INSERT INTO users (id, password, firstname, lastname, phone, `e-mail`, account, role, city, street, postal_code) "
                 + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -30,6 +43,9 @@ public class SqlQuery {
         public static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
     }
 
+    /**
+     * Class that contains all SQL queries for the table 'receivers'
+     */
     public static class ReceiverQuery {
         public static final String ADD_RECEIVER = "INSERT INTO receivers (id, firstname, lastname, phone, city, street, postal_code) "
                 + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)";
@@ -41,6 +57,10 @@ public class SqlQuery {
                 + "street = ?, postal_code = ? WHERE id = ?";
         public static final String DELETE_RECEIVER = "DELETE FROM receivers WHERE id = ?";
     }
+
+    /**
+     * Class that contains all SQL queries for the table 'orders'
+     */
     public static class OrdersQuery {
         public static final String ADD_ORDER = "INSERT INTO orders (id, date, city_from, freights_id, total_cost, delivery_type_id, receiver_info, sender_info, payment_status, execution_status) "
                 + "VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

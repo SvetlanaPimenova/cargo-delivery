@@ -9,7 +9,21 @@ import ua.pimenova.model.util.Calculator;
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 
+/**
+ * CalculateCommand class. Accessible by any user. Allows to calculate approximate shipping cost. Implements PRG pattern
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class CalculateCommand implements ICommand {
+
+    /**
+     * Checks method and calls required implementation
+     *
+     * @param req - to get method, session and set all required attributes
+     * @param resp - passed by application
+     * @return path to redirect or forward by front-controller
+     */
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) {
         return isMethodPost(req) ? executePost(req) : executeGet(req);

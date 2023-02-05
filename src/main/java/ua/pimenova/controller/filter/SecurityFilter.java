@@ -11,12 +11,22 @@ import ua.pimenova.model.database.entity.User;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * SecurityFilter class. Controls access to pages
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class SecurityFilter implements Filter {
     // commands access
     private static final Map<User.Role, List<String>> accessMap = new HashMap<>();
     private static List<String> commons = new ArrayList<>();
     private static final Logger LOGGER = Logger.getLogger(SecurityFilter.class);
 
+    /**
+     * Fills accessMap with roles and pages
+     * @param config passed by application
+     */
     @Override
     public void init(FilterConfig config) {
         LOGGER.info("Security Filter is initialized");
@@ -28,6 +38,12 @@ public class SecurityFilter implements Filter {
         commons = asList(config.getInitParameter("common"));
     }
 
+    /**
+     * Checks user in session and then checks if user has access to page or command.
+     * @param request passed by application
+     * @param response passed by application
+     * @param chain passed by application
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {

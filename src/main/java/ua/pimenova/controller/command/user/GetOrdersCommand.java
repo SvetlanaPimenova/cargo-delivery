@@ -1,6 +1,5 @@
 package ua.pimenova.controller.command.user;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -12,18 +11,34 @@ import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
-import java.io.IOException;
 import java.util.List;
 
+/**
+ * GetOrdersCommand class. Accessible by authorized user. Allows to get a list of all orders
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class GetOrdersCommand implements ICommand {
     private final OrderService orderService;
     private static final Logger LOGGER = Logger.getLogger(GetOrdersCommand.class);
+
+    /**
+     * @param orderService - OrderService implementation to use in command
+     */
     public GetOrdersCommand(OrderService orderService) {
         this.orderService = orderService;
     }
 
+    /**
+     * Builds required query for service, sets orders list in request and obtains required path. Also sets all required
+     * for pagination attributes
+     *
+     * @param request to get queries parameters and put orders list in request
+     * @return all orders page
+     */
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
         User user = (User) session.getAttribute("user");
         if (user == null) {

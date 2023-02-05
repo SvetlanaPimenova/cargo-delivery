@@ -1,6 +1,5 @@
 package ua.pimenova.controller.command.manager;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -10,19 +9,34 @@ import ua.pimenova.model.database.builder.QueryBuilder;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.exception.DaoException;
 import ua.pimenova.model.service.OrderService;
-import java.io.IOException;
 import java.util.List;
 
-
+/**
+ * GetPackagesCommand class. Accessible by manager. Allows to get a list of all orders
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class GetPackagesCommand implements ICommand {
     private final OrderService orderService;
     private static final Logger LOGGER = Logger.getLogger(GetPackagesCommand.class);
+
+    /**
+     * @param orderService - OrderService implementation to use in command
+     */
     public GetPackagesCommand(OrderService orderService) {
         this.orderService = orderService;
     }
 
+    /**
+     * Builds required query for service, sets orders list in request and obtains required path. Also sets all required
+     * for pagination attributes
+     *
+     * @param request to get queries parameters and put orders list in request
+     * @return all packages page
+     */
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
         QueryBuilder queryBuilder = getQueryBuilder(request);
         int noOfRecords;
         List<Order> orders;

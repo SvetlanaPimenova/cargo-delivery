@@ -1,6 +1,5 @@
 package ua.pimenova.controller.command.manager;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -14,13 +13,18 @@ import ua.pimenova.model.service.OrderService;
 import ua.pimenova.model.service.ReceiverService;
 import ua.pimenova.model.service.UserService;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * GetReportsCommand class. Accessible by manager. Allows to get a list of all orders/users due to the searching parameter
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class GetReportsCommand implements ICommand {
     private final OrderService orderService;
     private final UserService userService;
@@ -28,14 +32,25 @@ public class GetReportsCommand implements ICommand {
 
     private static final Logger LOGGER = Logger.getLogger(GetReportsCommand.class);
 
+    /**
+     * @param orderService - OrderService implementation to use in command
+     * @param userService - UserService implementation to use in command
+     * @param receiverService - ReceiverService implementation to use in command
+     */
     public GetReportsCommand(OrderService orderService, UserService userService, ReceiverService receiverService) {
         this.orderService = orderService;
         this.userService = userService;
         this.receiverService = receiverService;
     }
 
+    /**
+     * Obtains a list of all orders/users due to the searching parameter, sets list in request and obtains required path
+     *
+     * @param request to get searching parameter and put list in request
+     * @return view users page
+     */
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
         String searchParameter = request.getParameter("searchParameter");
         if(searchParameter == null || searchParameter.equals("")) {
             return Pages.REPORTS;

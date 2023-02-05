@@ -2,7 +2,8 @@ package ua.pimenova.model.database.dao.impl;
 
 import org.apache.log4j.Logger;
 import ua.pimenova.model.database.dao.HikariCPDataSource;
-import ua.pimenova.model.database.dao.SqlQuery;
+import ua.pimenova.model.database.dao.constants.SqlFields;
+import ua.pimenova.model.database.dao.constants.SqlQuery;
 import ua.pimenova.model.database.dao.UserDao;
 import ua.pimenova.model.database.entity.User;
 import ua.pimenova.model.exception.DaoException;
@@ -11,6 +12,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * User DAO class for database. Matches table 'users' in database.
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class UserDaoImpl implements UserDao {
     private static UserDaoImpl instance = null;
     private static final Logger LOGGER = Logger.getLogger(UserDaoImpl.class);
@@ -24,6 +31,13 @@ public class UserDaoImpl implements UserDao {
         return instance;
     }
 
+    /**
+     * Obtains instance of User from database by id
+     *
+     * @param id - value of id field in database
+     * @return - instance of User
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public User getByID(int id) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();
@@ -43,21 +57,26 @@ public class UserDaoImpl implements UserDao {
         User user = null;
         while (resultSet.next()) {
             user = new User();
-            user.setId(resultSet.getInt(User.UserFields.ID));
-            user.setPassword(resultSet.getString(User.UserFields.PASSWORD));
-            user.setFirstname(resultSet.getString(User.UserFields.FIRSTNAME));
-            user.setLastname(resultSet.getString(User.UserFields.LASTNAME));
-            user.setPhone(resultSet.getString(User.UserFields.PHONE));
-            user.setEmail(resultSet.getString(User.UserFields.EMAIL));
-            user.setAccount(resultSet.getInt(User.UserFields.ACCOUNT));
-            user.setRole(User.Role.valueOf(resultSet.getString(User.UserFields.ROLE)));
-            user.setCity(resultSet.getString(User.UserFields.CITY));
-            user.setStreet(resultSet.getString(User.UserFields.STREET));
-            user.setPostalCode(resultSet.getString(User.UserFields.POSTAL_CODE));
+            user.setId(resultSet.getInt(SqlFields.ID));
+            user.setPassword(resultSet.getString(SqlFields.PASSWORD));
+            user.setFirstname(resultSet.getString(SqlFields.FIRSTNAME));
+            user.setLastname(resultSet.getString(SqlFields.LASTNAME));
+            user.setPhone(resultSet.getString(SqlFields.PHONE));
+            user.setEmail(resultSet.getString(SqlFields.EMAIL));
+            user.setAccount(resultSet.getInt(SqlFields.ACCOUNT));
+            user.setRole(User.Role.valueOf(resultSet.getString(SqlFields.ROLE)));
+            user.setCity(resultSet.getString(SqlFields.CITY));
+            user.setStreet(resultSet.getString(SqlFields.STREET));
+            user.setPostalCode(resultSet.getString(SqlFields.POSTAL_CODE));
         }
         return user;
     }
 
+    /**
+     * Obtains list of all users from database
+     * @return - list of all users
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public List<User> getAll() throws DaoException {
         List<User> users = new ArrayList<>();
@@ -74,22 +93,28 @@ public class UserDaoImpl implements UserDao {
 
     private List<User> getListOfUsers(List<User> users, ResultSet resultSet) throws SQLException {
         while (resultSet.next()) {
-            int id  = resultSet.getInt(User.UserFields.ID);
-            String password = resultSet.getString(User.UserFields.PASSWORD);
-            String firstName = resultSet.getString(User.UserFields.FIRSTNAME);
-            String lastName = resultSet.getString(User.UserFields.LASTNAME);
-            String phone = resultSet.getString(User.UserFields.PHONE);
-            String email = resultSet.getString(User.UserFields.EMAIL);
-            int account  = resultSet.getInt(User.UserFields.ACCOUNT);
-            User.Role role = User.Role.valueOf(resultSet.getString(User.UserFields.ROLE));
-            String city = resultSet.getString(User.UserFields.CITY);
-            String street = resultSet.getString(User.UserFields.STREET);
-            String postalCode = resultSet.getString(User.UserFields.POSTAL_CODE);
+            int id  = resultSet.getInt(SqlFields.ID);
+            String password = resultSet.getString(SqlFields.PASSWORD);
+            String firstName = resultSet.getString(SqlFields.FIRSTNAME);
+            String lastName = resultSet.getString(SqlFields.LASTNAME);
+            String phone = resultSet.getString(SqlFields.PHONE);
+            String email = resultSet.getString(SqlFields.EMAIL);
+            int account  = resultSet.getInt(SqlFields.ACCOUNT);
+            User.Role role = User.Role.valueOf(resultSet.getString(SqlFields.ROLE));
+            String city = resultSet.getString(SqlFields.CITY);
+            String street = resultSet.getString(SqlFields.STREET);
+            String postalCode = resultSet.getString(SqlFields.POSTAL_CODE);
             users.add(new User(id, password, firstName, lastName, phone, email, account, role, city, street, postalCode));
         }
         return users;
     }
 
+    /**
+     * Inserts new user in database
+     * @param user - id will be generated by database. All fields should be not null
+     * @return - instance of User with generated id
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public User create(User user) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();
@@ -116,6 +141,12 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Updates user
+     * @param user - all fields should be not null
+     * @return - boolean value
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public boolean update(User user) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();
@@ -137,6 +168,12 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Updates specific field of user
+     * @param user - user, which password must be updated
+     * @return - boolean value
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public boolean updatePassword(User user) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();
@@ -150,6 +187,12 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Deletes user from database
+     * @param user - user, that must be deleted
+     * @return - boolean value
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public boolean delete(User user) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();
@@ -162,6 +205,12 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Obtains instance of User from database by phone
+     * @param phone - user phone to find
+     * @return - instance of User
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public User getByPhone(String phone) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();
@@ -178,6 +227,12 @@ public class UserDaoImpl implements UserDao {
         return null;
     }
 
+    /**
+     * Obtains instance of User from database by email
+     * @param email - user phone to find
+     * @return - instance of User
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public User getByEmail(String email) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();
@@ -194,6 +249,13 @@ public class UserDaoImpl implements UserDao {
         return null;
     }
 
+    /**
+     * Obtains instance of User from database by email and password
+     * @param email - user email to find
+     * @param password - user password to find
+     * @return - instance of User
+     * @throws DaoException - is wrapper for SQLException
+     */
     @Override
     public User getUserByEmailAndPassword(String email, String password) throws DaoException {
         try(Connection connection = HikariCPDataSource.getConnection();

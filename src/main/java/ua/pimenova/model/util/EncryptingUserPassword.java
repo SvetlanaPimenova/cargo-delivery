@@ -7,9 +7,21 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Encrypt incoming password
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class EncryptingUserPassword {
     private static final Logger LOGGER = Logger.getLogger(EncryptingUserPassword.class);
     private EncryptingUserPassword() {}
+
+    /**
+     * Encrypt user's password
+     * @param password - to properly encrypt use not null value
+     * @return - encrypted password
+     */
     public static String encryptPassword(String password) {
         MessageDigest crypt = null;
         try {

@@ -1,4 +1,4 @@
-package ua.pimenova.model.util;
+package ua.pimenova.model.util.validator;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

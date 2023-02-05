@@ -1,16 +1,25 @@
 package ua.pimenova.controller.command.common;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ua.pimenova.controller.command.ICommand;
 import ua.pimenova.controller.constants.Pages;
 
-import java.io.IOException;
-
+/**
+ * ShowSignUpPageCommand class. Accessible by any user
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class ShowSignUpPageCommand implements ICommand {
+
+    /**
+     * @param request - passed by application
+     * @param response - passed by application
+     * @return signUp page
+     */
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
         return Pages.SIGNUP_PAGE;
     }
 }

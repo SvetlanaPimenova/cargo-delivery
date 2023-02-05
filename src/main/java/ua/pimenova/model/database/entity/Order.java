@@ -2,6 +2,12 @@ package ua.pimenova.model.database.entity;
 
 import java.util.Date;
 
+/**
+ * Order entity class. Matches table 'orders' in database.
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class Order {
     private int id;
     private Date orderDate;
@@ -130,13 +136,16 @@ public class Order {
                 ", orderDate=" + orderDate + "}";
     }
 
-    public static class OrderFields {
-        public static final String ID = "id";
-        public static final String DATE = "date";
-        public static final String CITY_FROM = "city_from";
-        public static final String TOTAL_COST = "total_cost";
-        public static final String DELIVERY_TYPE_ID = "delivery_type_id";
-        public static final String PAYMENT_STATUS = "payment_status";
-        public static final String EXECUTION_STATUS = "execution_status";
-    }
+//    /**
+//     * Class that contains SQL database fields for the table 'orders'
+//     */
+//    public static class OrderFields {
+//        public static final String ID = "id";
+//        public static final String DATE = "date";
+//        public static final String CITY_FROM = "city_from";
+//        public static final String TOTAL_COST = "total_cost";
+//        public static final String DELIVERY_TYPE_ID = "delivery_type_id";
+//        public static final String PAYMENT_STATUS = "payment_status";
+//        public static final String EXECUTION_STATUS = "execution_status";
+//    }
 }

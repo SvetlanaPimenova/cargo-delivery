@@ -1,5 +1,11 @@
 package ua.pimenova.model.exception;
 
+/**
+ * Wrapper for SQLException
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class DaoException extends Exception {
     public DaoException() {}
 

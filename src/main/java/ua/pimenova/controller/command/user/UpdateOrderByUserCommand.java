@@ -1,6 +1,5 @@
 package ua.pimenova.controller.command.user;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
@@ -10,32 +9,49 @@ import ua.pimenova.model.database.entity.Freight;
 import ua.pimenova.model.database.entity.Order;
 import ua.pimenova.model.database.entity.Receiver;
 import ua.pimenova.model.exception.DaoException;
-import ua.pimenova.model.service.FreightService;
 import ua.pimenova.model.service.OrderService;
-import ua.pimenova.model.service.ReceiverService;
 import ua.pimenova.model.util.Calculator;
-import java.io.IOException;
 import static ua.pimenova.controller.command.CommandUtil.*;
 import static ua.pimenova.controller.constants.Commands.*;
 
+/**
+ * UpdateOrderByUserCommand class. Accessible by authorized user. Allows to update order. Implements PRG pattern
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class UpdateOrderByUserCommand implements ICommand {
 
     private final OrderService orderService;
-    private final FreightService freightService;
-    private final ReceiverService receiverService;
     private boolean isUpdated;
     private static final Logger LOGGER = Logger.getLogger(UpdateOrderByUserCommand.class);
-    public UpdateOrderByUserCommand(OrderService orderService, FreightService freightService, ReceiverService receiverService) {
+
+    /**
+     * @param orderService - OrderService implementation to use in command
+     */
+    public UpdateOrderByUserCommand(OrderService orderService) {
         this.orderService = orderService;
-        this.freightService = freightService;
-        this.receiverService = receiverService;
     }
 
+    /**
+     * Checks method and calls required implementation
+     *
+     * @param request - to get method, session and set all required attributes
+     * @param response - passed by application
+     * @return path to redirect or forward by front-controller
+     */
     @Override
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public String execute(HttpServletRequest request, HttpServletResponse response) {
         return isMethodPost(request) ? executePost(request) : executeGet(request);
     }
 
+    /**
+     * Called from doGet method in front-controller. Obtains required path and transfer attributes from session
+     * to request
+     *
+     * @param request to get errorMessage attribute from session and put it in request
+     * @return error page after failing or update order page
+     */
     private String executeGet(HttpServletRequest request) {
         getAttributeFromSessionToRequest(request,"order_id");
         getAttributeFromSessionToRequest(request, "isUpdated");
@@ -48,6 +64,13 @@ public class UpdateOrderByUserCommand implements ICommand {
         return "?order_id=" + orderId + "&isUpdated=" + isUpdated;
     }
 
+    /**
+     * Called from doPost method in front-controller. Tries to update an order. If successful redirects to update order page,
+     * if not sets error and redirects to executeGet
+     *
+     * @param request to get order id and parameters
+     * @return update order page if successful or path to redirect to executeGet method through front-controller if not
+     */
     private String executePost(HttpServletRequest request) {
         int id = Integer.parseInt(request.getParameter("order_id"));
         try {
@@ -55,10 +78,8 @@ public class UpdateOrderByUserCommand implements ICommand {
             if(order != null) {
                 Freight freight = order.getFreight();
                 Freight newFreight = setNewFreight(request, freight);
-                freightService.update(newFreight);
                 Receiver receiver = order.getReceiver();
                 Receiver newReceiver = setNewReceiver(request, receiver);
-                receiverService.update(newReceiver);
                 order = setNewOrder(request, order, newFreight, newReceiver);
                 isUpdated = orderService.update(order);
             }

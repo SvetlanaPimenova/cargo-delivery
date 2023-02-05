@@ -1,5 +1,12 @@
 package ua.pimenova.model.database.entity;
 
+/**
+ * ExtraOptions entity class. Contains 2 entities DeliveryType and Direction,
+ * each of them corresponds to tables 'delivery_type' and 'directions' respectively
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public class ExtraOptions {
     public enum DeliveryType {
         TO_THE_BRANCH(1, 1.0),

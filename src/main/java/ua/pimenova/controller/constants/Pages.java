@@ -1,5 +1,11 @@
 package ua.pimenova.controller.constants;
 
+/**
+ * Class that contains all pages
+ *
+ * @author Svetlana Pimenova
+ * @version 1.0
+ */
 public final class Pages {
 
     //common
