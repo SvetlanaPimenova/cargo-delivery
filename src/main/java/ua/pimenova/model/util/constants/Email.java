@@ -59,6 +59,10 @@ public class Email {
             "check detailed information, payment and execution statuses." +
             DOUBLE_ENTER + SIGNATURE;
 
+    public static final String MESSAGE_RESET_PASSWORD = HELLO + INFORMATION +
+            DOUBLE_ENTER + "Your temporary password is %s. Do not forget to change it in your profile!" +
+            DOUBLE_ENTER + "Enter your account " +
+            A_HREF + "%s" + "/home>here</a>, " + DOUBLE_ENTER + SIGNATURE;
 
     private Email() {}
 }

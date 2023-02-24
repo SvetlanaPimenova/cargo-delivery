@@ -25,7 +25,7 @@ body, html {
 .bgimg-1 {
   background-position: center;
   background-size: cover;
-  background-image: url("resources/img/Capture.jpg");
+  background-image: url("./resources/img/Capture.jpg");
   min-height: 100%;
 }
 
@@ -206,6 +206,10 @@ body, html {
             </div>
             <div class="w3-row-padding w3-left">
                 <input type="checkbox" onclick="myFunction()"> <fmt:message key="login.show.password"/>
+            </div>
+            <div class="w3-row-padding w3-left">
+                <fmt:message key="forgot.password"/>
+                <a href="reset_page"> <fmt:message key="reset.password"/></a>
             </div>
             <div class="w3-row-padding">
                 <br>

@@ -12,6 +12,8 @@ public final class Pages {
     public static final String PAGE_INDEX = "/index.jsp";
     public static final String PAGE_ERROR = "jsp/errorPage.jsp";
     public static final String SIGNUP_PAGE = "jsp/signUp.jsp";
+    public static final String RESET_PASSWORD_PAGE = "jsp/resetPassword.jsp";
+    public static final String NOTIFICATION_PAGE = "jsp/notification.jsp";
 
     //user
     public static final String USER_PROFILE = "jsp/user/userProfile.jsp";

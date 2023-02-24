@@ -18,6 +18,8 @@ public final class Commands {
     public static final String UPDATE_PROFILE = "/update";
 
     public static final String ERROR = "/error";
+    public static final String SHOW_RESET_PAGE = "/reset_page";
+    public static final String RESET_PASSWORD = "/resetPassword";
 
     //user commands
 

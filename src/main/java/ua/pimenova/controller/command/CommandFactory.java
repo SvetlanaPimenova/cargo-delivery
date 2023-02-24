@@ -46,6 +46,8 @@ public class CommandFactory {
         commands.put("profile", new ShowProfileCommand());
         commands.put("update", new UpdateProfileCommand(userService));
         commands.put("error", new ShowErrorPageCommand());
+        commands.put("reset_page", new ShowResetPageCommand());
+        commands.put("resetPassword", new ResetPasswordCommand(userService));
 
         //user commands
         commands.put("createOrder", new CreateOrderCommand(orderService));

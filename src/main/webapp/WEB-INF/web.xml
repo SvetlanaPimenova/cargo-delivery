@@ -58,7 +58,11 @@
     </init-param>
     <init-param>
       <param-name>common</param-name>
-      <param-value>calculate login logout signup home profile update signup_page pdf error</param-value>
+      <param-value>calculate login signup home signup_page error reset_page resetPassword</param-value>
+    </init-param>
+    <init-param>
+      <param-name>authorized</param-name>
+      <param-value>logout profile update pdf</param-value>
     </init-param>
   </filter>
 

@@ -21,6 +21,7 @@ public class SecurityFilter implements Filter {
     // commands access
     private static final Map<User.Role, List<String>> accessMap = new HashMap<>();
     private static List<String> commons = new ArrayList<>();
+    private static List<String> authorized = new ArrayList<>();
     private static final Logger LOGGER = Logger.getLogger(SecurityFilter.class);
 
     /**
@@ -36,6 +37,8 @@ public class SecurityFilter implements Filter {
 
         // commons
         commons = asList(config.getInitParameter("common"));
+        //authorized user
+        authorized = asList(config.getInitParameter("authorized"));
     }
 
     /**
@@ -75,7 +78,7 @@ public class SecurityFilter implements Filter {
         if(userRole == null) {
             return commons.contains(commandName);
         }
-        return accessMap.get(userRole).contains(commandName) || commons.contains(commandName);
+        return accessMap.get(userRole).contains(commandName) || commons.contains(commandName) || authorized.contains(commandName);
     }
 
     @Override

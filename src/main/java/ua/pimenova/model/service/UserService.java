@@ -85,4 +85,13 @@ public interface UserService {
      * @throws DaoException - is wrapper for SQLException
      */
     User getUserByEmailAndPassword(String email, String password) throws DaoException;
+
+    /**
+     * Calls DAO to set temporary password
+     * @param user - user, which password must be updated
+     * @param temporaryPassword - random password
+     * @return - boolean value
+     * @throws DaoException - is wrapper for SQLException
+     */
+    boolean resetPassword(User user, String temporaryPassword) throws DaoException;
 }

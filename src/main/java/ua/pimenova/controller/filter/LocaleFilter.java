@@ -53,7 +53,7 @@ public class LocaleFilter implements Filter {
                 if(isCorrect(locale)) {
                     httpRequest.getSession().setAttribute("locale", locale);
                 } else {
-                    httpRequest.getSession().setAttribute("locale", defaultLocale);
+                    httpRequest.getSession().setAttribute("locale", new Locale(defaultLocale));
                 }
             }
         }

@@ -122,4 +122,18 @@ public class UserServiceImpl implements UserService {
         String encryptedPassword = EncryptingUserPassword.encryptPassword(password);
         return userDao.getUserByEmailAndPassword(email, encryptedPassword);
     }
+
+    /**
+     * Calls DAO to set temporary password
+     * @param user - user, which password must be updated
+     * @param temporaryPassword - random password
+     * @return - boolean value
+     * @throws DaoException - is wrapper for SQLException
+     */
+    @Override
+    public boolean resetPassword(User user, String temporaryPassword) throws DaoException {
+        String encryptedPassword = EncryptingUserPassword.encryptPassword(temporaryPassword);
+        user.setPassword(encryptedPassword);
+        return userDao.updatePassword(user);
+    }
 }
