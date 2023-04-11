@@ -29,13 +29,15 @@ class SecurityFilterTest {
 
     private static final String USER = "createOrder orders pageCreate deleteOrder updateOrder_user update_page account top_up transaction bill_pdf";
     private static final String MANAGER = "reports packages updateStatus updateShipment_page";
-    private static final String COMMON = "calculate login logout signup home profile update signup_page pdf error";
+    private static final String COMMON = "calculate login signup home signup_page error reset_page resetPassword";
+    private static final String AUTHORIZED = "logout profile update pdf";
 
     @BeforeEach
     void setDefault() {
         when(filterConfig.getInitParameter("manager")).thenReturn(MANAGER);
         when(filterConfig.getInitParameter("user")).thenReturn(USER);
         when(filterConfig.getInitParameter("common")).thenReturn(COMMON);
+        when(filterConfig.getInitParameter("authorized")).thenReturn(AUTHORIZED);
         when(request.getSession()).thenReturn(session);
     }
 
